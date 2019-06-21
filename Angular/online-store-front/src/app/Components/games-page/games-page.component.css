@@ -1,0 +1,18 @@
+.game-filter-panel{
+    height: 500px;
+    background-color: greenyellow;
+    width: 200px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.wrapper.game-filter-panel{
+    justify-content: flex-start;
+}

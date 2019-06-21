@@ -1,0 +1,258 @@
+.left-header{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.right-header{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.header-item{
+    cursor: pointer;
+    display: block;
+    color: black;
+    font-weight: bold;
+}
+
+.left-header :hover{
+    color: aqua;
+}
+
+.right-header :hover{
+    color: aqua;
+}
+
+.row-wrapper{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.row-wrapper.left-header{
+    justify-content: flex-start;
+}
+
+.row-wrapper.right-header{
+    justify-content: flex-end;
+}
+
+h1{
+    padding-left: 50px;
+}
+
+.login-wrapper{
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.login-btn-group{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.login-btn-group button{
+    width: 150px;
+    margin: 10px;
+    background-color:#7BA805;
+    border-radius: 5px;
+    border-color: grey;
+    font-weight: bold;
+    color:#E2FEB4;
+}
+
+.flex-container{
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 50px;
+    flex-wrap: wrap; 
+    position: relative;
+}
+
+.nav-menu{
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    z-index: 2;
+    top: 25px;
+    right: 50px;
+}
+
+.nav-menu a {
+    padding: 10px;
+    width: 160px;;
+    border: solid 1px black;
+    color: orange;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+.nav-menu :last-child{
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.nav-menu :first-child{
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.site-name{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.slogans{
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+    background-color: #4E6FA4;
+    border-radius: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.first-slogan{
+    color: white;
+    font-weight: bold;
+    font-size: 18pt;
+    padding: 80px 0px 0px 35px;
+}
+
+.second-slogan{
+    color: white;
+    font-weight: bold;
+    font-size: 22px;
+    padding-left: 35px;
+}
+
+.first-part-sentance{
+    font-size: 25px;
+}
+
+.pc-image{
+    z-index: 2;
+    position: absolute;
+    height: 260px;
+    right: 10px;
+    bottom: -30px;
+}
+
+.pre-footer{
+    position: relative;
+    z-index: 1;
+    display: flex;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+.get-in-touch{
+    display: flex;
+    flex-direction: column;
+}
+
+.get-in-touch p{
+    font-weight: bold;
+    font-size: 17pt;
+}
+
+.get-in-header{
+    position: absolute;
+    z-index: 2;
+    top: -10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.in-touch-form{
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    width: 300px;
+    background-color: rgb(233, 230, 192);
+}
+
+.in-touch-form button{
+    width: 75px;
+    background-color: orange;  
+    align-self: flex-end;  
+}
+
+.twitter-updates{
+    display: flex;
+    flex-direction: column;
+}
+
+.twitter-header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: absolute;
+    z-index: 2;
+    top: 0px;
+}
+
+.twitter-header img{
+    height: 70px;
+}
+
+.twitter-header p{
+    font-weight: bold;
+    font-size: 17pt;
+}
+
+.twitter-news-table{
+    width: 300px;
+    background-color: rgb(193, 225, 240);
+}
+
+.twitter-news-table tr{
+    display: flex;
+    padding: 10px;
+}
+
+.from-blog{
+    display: flex;
+    flex-direction: column;
+}
+
+.blog-header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: absolute;
+    z-index: 2;
+    top: 0px;
+}
+
+.blog-header img{
+    padding: 10px;
+}
+
+.blog-header p{
+    font-weight: bold;
+    font-size: 17pt;
+}
+
+.blog-news-table{
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(233, 230, 192);
+    width: 300px;
+    padding: 10px;
+    align-items: stretch;
+}
+
+

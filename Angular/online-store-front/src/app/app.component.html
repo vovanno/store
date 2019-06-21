@@ -1,0 +1,97 @@
+<div class="container-fluid">
+  <div class="row-wrapper">
+    <div class="left-header">
+      <a class="header-item" routerLink="/Main" routerLinkActive="active">&nbsp;Home | </a>
+      <a class="header-item" routerLink="/About" routerLinkActive="active">&nbsp;About Us | </a>
+      <a class="header-item" routerLink="/Career" routerLinkActive="active">&nbsp;Career</a>
+    </div>
+    <div class="right-header">
+      <a class="header-item" routerLink="/Support" routerLinkActive="active">&nbsp;Support | </a>
+      <a class="header-item" routerLink="/Contucts" routerLinkActive="active">&nbsp;Contuct us |</a>
+      <a class="header-item" routerLink="/OnlineSupport" routerLinkActive="active">&nbsp;Online Support |</a>
+      <a class="header-item" routerLink="/Security" routerLinkActive="active">&nbsp;Security Information</a>
+    </div>
+  </div>
+  <div class="login-wrapper">
+    <h1>Gamestore</h1>
+    <div class="login-btn-group">
+      <button class="support-login">Support login</button>
+      <button class="client-login">Client login</button>
+    </div>
+  </div>
+  <div class="flex-container">
+    <div class="nav-menu">
+      <a routerLink="/Games" routerLinkActive="Active">Games</a>
+      <a routerLink="/Genres" routerLinkActive="Active">Genres</a>
+      <a routerLink="/Publishers" routerLinkActive="Active">Publishers</a>
+      <a routerLink="/Orders" routerLinkActive="Active">Orders</a>
+      <a routerLink="/Bucket" routerLinkActive="Active">My bucket</a>
+    </div>
+  </div>
+  <div class="slogans">
+    <p class="first-slogan">
+      What can make your life easirer?
+    </p>
+    <p class="second-slogan">
+      <span class="first-part-sentance">EMPOWERED SOLUTIONS</span><br />
+      with SIMPLE PROCESS
+    </p>
+    <img class="pc-image" src="assets/images/macbookpro.png" alt="pc-image">
+  </div>
+
+  <router-outlet></router-outlet>
+
+  <div class="pre-footer">
+    <div class="get-in-touch">
+      <div class="get-in-header">
+          <img src="/assets/images/envelope.png" alt="envelope">
+          <p>GET IN TOUCH</p>    
+      </div>
+        <form class="in-touch-form" action="">
+          <label for="">Name:</label>
+          <input type="text">
+          <label for="">Email:</label>
+          <input type="text">
+          <label for="">Message:</label>
+          <textarea name="" id="" cols="30" rows="5"></textarea>
+          <br>
+          <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div class="twitter-updates">
+      <div class="twitter-header">
+          <img src="/assets/images/twitter.png" alt="envelope">
+          <p>TWITTER UPDATES</p>
+      </div>
+      <table class="twitter-news-table">
+        <tr>first news</tr>
+        <hr>
+        <tr>second news</tr>
+        <hr>
+        <tr>third news</tr>
+      </table>
+    </div>
+
+  <div class="from-blog">
+    <div class="blog-header">
+        <img src="/assets/images/waves.png" alt="envelope">
+        <p>FROM THE BLOG</p>
+    </div>
+    <table class="blog-news-table">
+        <tr>first news</tr>
+        <hr>
+        <tr>second news</tr>
+        <hr>
+        <tr>third news</tr>
+      </table>
+
+  </div>
+</div>
+
+
+  <div class="footer">
+    footer inc@
+  </div>
+
+</div>
