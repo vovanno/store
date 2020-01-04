@@ -1,4 +1,5 @@
 import { Genre } from './genre';
+import { Platform } from './platform';
 
 export class Game {
     gameId:number;
@@ -8,5 +9,6 @@ export class Game {
     amountOfViews:number;
     price:number;
     genres:Genre[];
-    dateOfAdding:Date;
+    dateOfAdding:string;
+    platforms:Platform[];
 }

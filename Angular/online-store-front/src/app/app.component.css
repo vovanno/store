@@ -1,3 +1,40 @@
+.wrapper{
+    padding: 0 10px 0 10px;
+}
+
+.head-menu{
+    display: flex;    
+}
+
+.left-top-menu{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.right-top-menu{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.top-list{
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    justify-content: space-between;
+}
+
+.top-list li{
+    border-right: solid 1px black;
+}
+
+.top-list li:last-child{
+    border-right: none
+}
+
+
+
+
+
 .left-header{
     display: flex;
     justify-content: space-between;
@@ -25,18 +62,18 @@
     color: aqua;
 }
 
-.row-wrapper{
+.top-row-wrapper{
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
     padding: 10px;
 }
 
-.row-wrapper.left-header{
+.top-row-wrapper.left-header{
     justify-content: flex-start;
 }
 
-.row-wrapper.right-header{
+.top-row-wrapper.right-header{
     justify-content: flex-end;
 }
 
@@ -67,35 +104,6 @@ h1{
     color:#E2FEB4;
 }
 
-.flex-container{
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 50px;
-    flex-wrap: wrap; 
-    position: relative;
-}
-
-.nav-menu{
-    display: flex;
-    flex-wrap: wrap;
-    position: absolute;
-    z-index: 2;
-    top: 25px;
-    right: 50px;
-}
-
-.nav-menu a {
-    padding: 10px;
-    width: 160px;;
-    border: solid 1px black;
-    color: orange;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-}
-
 .nav-menu :last-child{
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -113,26 +121,34 @@ h1{
 
 .slogans{
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     height: 300px;
     background-color: #4E6FA4;
     border-radius: 10px;
     position: relative;
     z-index: 1;
+    margin-bottom: 30px;
+    padding: 80px 0px 0px 35px;
+    width: 100%;
+
 }
 
-.first-slogan{
+.slogan-text{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.slogan-text:first-child{
     color: white;
     font-weight: bold;
     font-size: 18pt;
-    padding: 80px 0px 0px 35px;
 }
 
-.second-slogan{
+.slogan-text:last-child{
     color: white;
     font-weight: bold;
     font-size: 22px;
-    padding-left: 35px;
 }
 
 .first-part-sentance{
@@ -140,11 +156,9 @@ h1{
 }
 
 .pc-image{
-    z-index: 2;
-    position: absolute;
+    display: flex;
     height: 260px;
-    right: 10px;
-    bottom: -30px;
+
 }
 
 .pre-footer{
@@ -153,8 +167,13 @@ h1{
     display: flex;
     padding-top: 50px;
     padding-bottom: 50px;
-    justify-content: space-between;
+    margin-top: 10px;
+    justify-content: space-evenly;
     align-items: stretch;
+    flex-wrap: wrap;
+    border-top: dashed grey;
+
+
 }
 
 .get-in-touch{
@@ -182,17 +201,37 @@ h1{
     padding: 20px;
     width: 300px;
     background-color: rgb(233, 230, 192);
+    border-radius: 10px;
+}
+
+.in-touch-form input, .in-touch-form textarea{
+    border-radius: 10px;
+    border: solid 1px rgb(204, 202, 169);
+}
+
+.in-touch-form textarea{
+    resize: none;
 }
 
 .in-touch-form button{
-    width: 75px;
-    background-color: orange;  
-    align-self: flex-end;  
+    background-color: orange;
+    align-self: flex-end;
+    border-radius: 10px;
+    border: 2px solid rgb(204, 133, 2);
+    width: 130px;
+    font-weight: bold; 
+    color: white;
 }
 
 .twitter-updates{
     display: flex;
+    width: 300px;
     flex-direction: column;
+}
+
+.clearer{
+    height: 0;
+    clear: both;
 }
 
 .twitter-header{
@@ -208,19 +247,49 @@ h1{
     height: 70px;
 }
 
+.outlet{
+    position: relative;
+}
+
 .twitter-header p{
     font-weight: bold;
     font-size: 17pt;
 }
 
-.twitter-news-table{
-    width: 300px;
+.twitter-body{
+    display: flex;
+    flex-direction: column;
+    height: 375px;
+    align-content: stretch;
     background-color: rgb(193, 225, 240);
+    justify-content: space-between;
+    border-radius: 10px;
 }
 
-.twitter-news-table tr{
+.twitter-body button{
+    background-color: orange;
+    align-self: flex-end;
+    margin: 15px;
+    border-radius: 10px;
+    border: 2px solid rgb(204, 133, 2);
+    width: 130px;
+    font-weight: bold; 
+    color: white;
+}
+
+.twitter-news{
+    width: 100%;
+    height: 100%;
     display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    list-style: none;
     padding: 10px;
+    overflow: hidden;
+}
+
+.twitter-news li{
+    border-bottom: dashed 1px;
 }
 
 .from-blog{
@@ -246,13 +315,189 @@ h1{
     font-size: 17pt;
 }
 
-.blog-news-table{
+.blog-body{
+    display: flex;
+    height: 375px;
+    width: 300px;
+    background-color: rgb(233, 230, 192);
+    flex-direction: column;
+    justify-content: flex-end;
+    border-radius: 10px;
+}
+
+.blog-body button{
+    background-color: orange;
+    align-self: flex-end;
+    margin: 15px;
+    border-radius: 10px;
+    border: 2px solid rgb(204, 133, 2);
+    width: 130px;
+    font-weight: bold; 
+    color: white;
+}
+
+.blog-news{
     display: flex;
     flex-direction: column;
-    background-color: rgb(233, 230, 192);
-    width: 300px;
     padding: 10px;
-    align-items: stretch;
+    list-style: none;
+    justify-content: space-around;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.twitter-news li, .blog-news li{
+    padding-bottom: 5px;
+}
+
+.blog-news li{
+    border-bottom: dashed 1px;
+}
+
+.footer{
+    display: flex;
+    border-top: solid 3px rgb(190, 182, 182);
+    padding-top: 20px;
+    padding-bottom: 50px;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.left-block{
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+.central-block{
+    display: flex;
+    flex-direction: column;
+    color: grey;
+}
+
+.central-block span, .right-block span{
+    font-weight: bold;
+}
+
+.right-block{
+    display: flex;
+    flex-direction: column;
+    color: grey;
+}
+
+@media all and (max-width: 975px){
+    .get-in-header, .twitter-header, .blog-header {
+    position: relative ;
+    }
+
+    .get-in-header img{
+        height: 70px;
+    }
+
+    .get-in-header{
+        top: 0px;
+    }
+
+    .pre-footer{
+        display: flex;
+        justify-content: space-around;
+        padding-top: 0px;
+
+    }
+
+    .nav-menu{
+        display: flex;
+        position: relative;
+        flex-direction: row;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+}
+
+@media all and (min-width: 921px){
+    .nav-menu a {
+        padding: 10px;
+        width: 160px;;
+        border: solid 1px black;
+        color: orange;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+    }
+
+    .nav-menu{
+        display: flex;
+        flex-wrap: wrap;
+        position: absolute;
+        z-index: 2;
+        top: 25px;
+        right: 50px;
+    }
+
+    .flex-container{
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 50px;
+        flex-wrap: wrap; 
+        position: relative;
+    } 
+}
+
+@media all and (max-width: 920px){
+    .nav-menu a{
+        padding: 10px;
+        width: 160px;;
+        border: solid 1px black;
+        color: orange;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 10px;
+        margin: 5px;
+    }
+
+    .pc-image{
+        height: 170px;
+    }
+
+    .slogans{
+        padding:10px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .nav-menu{
+        position: relative;
+    }
+
+    .flex-container{
+        display: flex;
+        justify-content: space-around;
+        flex-direction: row;
+    }
+}
+
+@media all and (max-width: 651px){
+    .login-wrapper{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .login-wrapper h1{
+        display: flex;
+        justify-content: center;
+        padding: 0px;
+    }
+
+    .pc-image{
+        display: none;
+    }
 }
 
 

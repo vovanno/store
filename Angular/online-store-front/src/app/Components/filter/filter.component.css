@@ -1,0 +1,109 @@
+.wrapper{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.filter{
+    display: flex;
+    flex-direction: column;
+    width: 270px;
+    border: solid 1px black;
+    border-radius: 10px;
+    background-color:  rgb(203, 240, 227);
+}
+
+.filter p{
+    align-self: center;
+    font-weight: bold;
+}
+
+.genre-area{
+    background-color: rgb(161, 228, 204);
+    display: flex;
+    flex-direction: column;
+}
+
+.genre-area p, .platform-area p, .publisher-area p, .date-area p{
+    align-self: center;
+    font-weight: bold;
+}
+
+.genre-ckeck-area, .platform-ckeck-area, .publisher-ckeck-area{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    flex-direction: column;
+}
+
+.platform-area{
+    display: flex;
+    flex-direction: column;
+}
+
+.publisher-area{
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(161, 228, 204);
+}
+
+.date-area, .popularity-area{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.date-selector, .popular-type-selector{
+    display: flex;
+    width: 80%;
+    border-radius: 10px;
+}
+
+.price-area{
+    display: flex;
+    flex-direction: column;
+}
+
+.price-selector{
+    display: flex;
+    justify-content: space-around;
+}
+
+.price-from, .price-to{
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+}
+
+.price-from input, .price-to input{
+    border-radius: 10px;
+    height: 1.5em;
+    border: solid 1px grey;
+}
+
+.filter-form{
+    display: flex;
+    flex-direction: column;
+}
+
+.submit-filter{
+    display: flex;
+    justify-content: center;
+    background-color: rgb(165, 199, 187);
+    align-self: center;
+    margin: 15px;
+    border-radius: 10px;
+    border: 2px solid rgb(133, 177, 161);
+    width: 90%;
+    font-weight: bold;
+    color: white;    
+}
+
+ul {
+    list-style: none;
+}
+
+@media all and (max-width:450px){
+    .wrapper{
+        justify-content: center;
+    }
+}

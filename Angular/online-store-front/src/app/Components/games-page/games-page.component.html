@@ -1,7 +1,15 @@
 <div class="wrapper">
-    <div class="game-filter-panel">
-        <p>Filters</p>
-        <button (click)="Show()">Apply</button>
+    <div class="filter-area">
+        <app-filter></app-filter>
+        <div class="create-game-area">
+            <p>Add your own game</p>
+            <button (click)="CreateGame()">Add Game</button>
+        </div>
     </div>
-    <app-game-item *ngFor="let game of gameService.gameData" [game]="game"></app-game-item>
+    <div class="games-area">
+        <h3>Games list</h3>
+        <div class="games-lsit">
+            <app-game-item *ngFor="let game of gameService.gameData" [game]="game"></app-game-item>
+        </div>
+    </div>
 </div>

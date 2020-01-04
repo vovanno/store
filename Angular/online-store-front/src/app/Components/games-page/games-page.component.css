@@ -1,18 +1,57 @@
-.game-filter-panel{
-    height: 500px;
-    background-color: greenyellow;
-    width: 200px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-}
-
 .wrapper{
     display: flex;
-    flex-wrap: wrap;
+}
+
+.filter-area{
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-area p{
+    font-size: 20px;
+}
+
+.create-game-area{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 270px;
+    border: 2px dashed orange;
+    border-radius: 10px;
+    margin-top: 20px;
+    justify-content: space-around;
+}
+
+.create-game-area button{
+    background-color: orange;
+    align-self: flex-end;
+    border-radius: 10px;
+    border: 2px solid rgb(204, 133, 2);
+    width: 130px;
+    font-weight: bold;
+    color: white;
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    margin: 5px;
+}
+
+.games-area{
+    display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
-.wrapper.game-filter-panel{
-    justify-content: flex-start;
+.games-lsit{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+@media all and (max-width:640px){
+    .wrapper{
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+    }
 }

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameService } from 'src/app/Services/game.service';
-//import { runInThisContext } from 'vm';
-import { Game } from 'src/app/Models/game';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-games-page',
@@ -10,7 +9,7 @@ import { Game } from 'src/app/Models/game';
 })
 export class GamesPageComponent implements OnInit {
 
-  constructor(private gameService: GameService) { }
+  constructor(private gameService: GameService, private router: Router) { }
 
   ngOnInit() {
      this.getGames();
@@ -20,6 +19,10 @@ export class GamesPageComponent implements OnInit {
     this.gameService.GetGames().subscribe((data: any) => {
       this.gameService.gameData = data;
     }, () => console.log("data didnt received"))
+  }
+
+  CreateGame(){
+    this.router.navigate(["CreateGame"]);
   }
 
 }

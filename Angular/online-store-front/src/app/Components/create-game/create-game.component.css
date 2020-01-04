@@ -1,0 +1,27 @@
+ul{
+    list-style: none;
+    margin-right: -30px;
+}
+
+.wrapper{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.create-game-form{
+    display: flex;
+    flex-direction: column;
+}
+
+.game-form-area{
+    width: 400px;
+    padding: 10px;
+    border: 1px solid black;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
