@@ -9,9 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BLL", "BLL\BLL.csproj", "{F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{23697C0A-619F-428C-B4BF-FE306D70952F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BLLTests", "BLLTests\BLLTests.csproj", "{130ECBDD-D5C2-4201-940F-A5512BD808BD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossCuttingFunctionality", "CrossCuttingFunctionality\CrossCuttingFunctionality.csproj", "{8D0C17C7-44D5-4C13-9655-DBCC9AB8D782}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossCuttingFunctionality", "CrossCuttingFunctionality\CrossCuttingFunctionality.csproj", "{8D0C17C7-44D5-4C13-9655-DBCC9AB8D782}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +29,6 @@ Global
 		{23697C0A-619F-428C-B4BF-FE306D70952F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23697C0A-619F-428C-B4BF-FE306D70952F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23697C0A-619F-428C-B4BF-FE306D70952F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{130ECBDD-D5C2-4201-940F-A5512BD808BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{130ECBDD-D5C2-4201-940F-A5512BD808BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{130ECBDD-D5C2-4201-940F-A5512BD808BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{130ECBDD-D5C2-4201-940F-A5512BD808BD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8D0C17C7-44D5-4C13-9655-DBCC9AB8D782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8D0C17C7-44D5-4C13-9655-DBCC9AB8D782}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D0C17C7-44D5-4C13-9655-DBCC9AB8D782}.Release|Any CPU.ActiveCfg = Release|Any CPU

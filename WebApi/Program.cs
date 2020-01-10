@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using Serilog.Events;
 using System;
+using Microsoft.Extensions.Configuration;
 
 namespace WebApi
 {
@@ -13,13 +14,14 @@ namespace WebApi
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console()
-                .WriteTo.Async(p=>p.File("log-.txt", rollOnFileSizeLimit: true, fileSizeLimitBytes: 10000000, rollingInterval: RollingInterval.Month,restrictedToMinimumLevel:LogEventLevel.Information))
+                .WriteTo.Async(p => p.File("log-.txt", rollOnFileSizeLimit: true, fileSizeLimitBytes: 10000000, rollingInterval: RollingInterval.Month, restrictedToMinimumLevel: LogEventLevel.Information))
                 .CreateLogger();
             try
             {
                 Log.Information("Application started.");
-                CreateWebHostBuilder(args).Build().Run();
-                
+                CreateWebHostBuilder(args)
+                    .Build().Run();
+
             }
             catch (Exception e)
             {
@@ -34,7 +36,11 @@ namespace WebApi
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseSerilog()
-                .UseStartup<Startup>();
+                .UseKestrel()
+                .UseStartup<Startup>().ConfigureAppConfiguration((context, config) =>
+                    {
+                        config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json");
+                    });
 
     }
 }

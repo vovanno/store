@@ -3,6 +3,10 @@ using DAL.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.IO;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 using AppContext = DAL.Context.AppContext;
 
 namespace DAL.Configuration
@@ -11,7 +15,7 @@ namespace DAL.Configuration
     {
         public static void RegisterDependencies(IServiceCollection services, string connection)
         {
-            services.AddDbContext<AppContext>(opt => opt.UseSqlServer(connection));
+            services.AddDbContext<AppContext>(opt => opt.UseMySQL(connection));
             services.AddScoped(typeof(IBaseRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAppContext, AppContext>();
@@ -24,6 +28,36 @@ namespace DAL.Configuration
                 RequireNonAlphanumeric = true
             })
                 .AddEntityFrameworkStores<AppContext>();
+            TryMigrate(connection);
+        }
+
+        public static void TryMigrate(string connection)
+        {
+            var host = "gamestoreapidatabase.cnn7n8qfjggv.eu-west-2.rds.amazonaws.com";
+            var port = 3306;
+
+            try
+            {
+                using (var tcpClient = new TcpClient())
+                {
+                    tcpClient.Connect(host, port);
+
+                    //using (var reader = new StreamReader(tcpClient.GetStream()))
+                    //{
+                    //    var response = reader.ReadToEnd();
+                    //    Console.WriteLine(response);
+                    //}
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            var builder = new DbContextOptionsBuilder<AppContext>().UseMySQL(connection);
+            var context = new AppContext(builder.Options);
+            context.Database.Migrate();
+
         }
     }
 }
