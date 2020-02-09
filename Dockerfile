@@ -10,8 +10,10 @@ COPY OnlineStore.sln .
 RUN dotnet restore
 COPY . .
 
-RUN dotnet publish -o /publish
+ARG aspnetcore_environment="Local"
+RUN export ASPNETCORE_ENVIRONMENT=aspnetcore_environment
 
+RUN dotnet publish -o /publish
 WORKDIR /app
 RUN dotnet publish -o /publish
 WORKDIR /publish
