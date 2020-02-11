@@ -1,0 +1,79 @@
+﻿AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+  OnlineStoreVpc:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: '10.0.0.0/16'
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  OnlineStoreSubnet1:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref OnlineStoreVpc
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: us-east-2
+      CidrBlock: "10.0.0.0/20"
+      MapPublicIpOnLaunch: true
+
+  OnlineStoreSubnet2:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref OnlineStoreVpc
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: us-east-2
+      CidrBlock: "10.0.32.0/20"
+      MapPublicIpOnLaunch: true
+
+  InternetGateway:
+    Type: "AWS::EC2::InternetGateway"
+
+  VpcGatewayAttachment:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref OnlineStoreVpc
+
+  RouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref OnlineStoreVpc
+
+  RouteTableAssociation1:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref OnlineStoreSubnet1
+      RouteTableId: !Ref RouteTable
+
+  RouteTableAssociation2:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref OnlineStoreSubnet2
+      RouteTableId: !Ref RouteTable
+
+  InternetRoute:
+    Type: "AWS::EC2::Route"
+    DependsOn: VpcGatewayAttachment
+    Properties:
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+
+Outputs:
+  OnlineStoreVpc:
+    Value: !Ref OnlineStoreVpc
+    Export:
+      Name: "OnlineStoreVpc"
+
+  OnlineStoreSubnet1:
+    Value: !Ref OnlineStoreSubnet1
+    Export:
+      Name: "OnlineStoreSubnet1"
+
+  OnlineStoreSubnet2:
+    Value: !Ref OnlineStoreSubnet2
+    Export:
+      Name: "OnlineStoreSubnet2"

@@ -3,7 +3,6 @@ using System;
 using DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using AppContext = DAL.Context.AppContext;
 
@@ -16,15 +15,13 @@ namespace DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("DAL.Entities.Comment", b =>
                 {
                     b.Property<int>("CommentId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("AmountOfLikes");
 
@@ -54,8 +51,7 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Entities.Game", b =>
                 {
                     b.Property<int>("GameId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("AmountOfViews");
 
@@ -70,15 +66,11 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasMaxLength(50);
 
-                    b.Property<int?>("OrderId");
-
                     b.Property<double>("Price");
 
                     b.Property<int>("PublisherId");
 
                     b.HasKey("GameId");
-
-                    b.HasIndex("OrderId");
 
                     b.HasIndex("PublisherId");
 
@@ -114,8 +106,7 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Entities.Genre", b =>
                 {
                     b.Property<int>("GenreId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<bool>("IsDeleted");
 
@@ -190,8 +181,7 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Entities.Genre+SubGenre", b =>
                 {
                     b.Property<int>("SubGenreId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("GenreId");
 
@@ -279,8 +269,7 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Entities.Order", b =>
                 {
                     b.Property<int>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<bool>("IsDeleted");
 
@@ -288,18 +277,31 @@ namespace DAL.Migrations
 
                     b.Property<DateTime?>("ShippedDate");
 
-                    b.Property<string>("Status");
+                    b.Property<string>("Status")
+                        .IsRequired();
 
                     b.HasKey("OrderId");
 
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("DAL.Entities.OrderGame", b =>
+                {
+                    b.Property<int>("OrderId");
+
+                    b.Property<int>("GameId");
+
+                    b.HasKey("OrderId", "GameId");
+
+                    b.HasIndex("GameId");
+
+                    b.ToTable("OrderGames");
+                });
+
             modelBuilder.Entity("DAL.Entities.PlatformType", b =>
                 {
                     b.Property<int>("PlatformTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<bool>("IsDeleted");
 
@@ -318,8 +320,7 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Entities.Publisher", b =>
                 {
                     b.Property<int>("PublisherId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<bool>("IsDeleted");
 
@@ -361,8 +362,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles");
                 });
@@ -370,8 +370,7 @@ namespace DAL.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ClaimType");
 
@@ -432,8 +431,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -441,8 +439,7 @@ namespace DAL.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ClaimType");
 
@@ -514,10 +511,6 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Entities.Game", b =>
                 {
-                    b.HasOne("DAL.Entities.Order")
-                        .WithMany("Orders")
-                        .HasForeignKey("OrderId");
-
                     b.HasOne("DAL.Entities.Publisher", "Publisher")
                         .WithMany("Games")
                         .HasForeignKey("PublisherId")
@@ -555,6 +548,19 @@ namespace DAL.Migrations
                     b.HasOne("DAL.Entities.Genre", "Genre")
                         .WithMany("SubGenres")
                         .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("DAL.Entities.OrderGame", b =>
+                {
+                    b.HasOne("DAL.Entities.Game", "Game")
+                        .WithMany("OrderGames")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DAL.Entities.Order", "Order")
+                        .WithMany("OrdersGames")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

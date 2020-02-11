@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.IO;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using AppContext = DAL.Context.AppContext;
 
 namespace DAL.Configuration
@@ -15,7 +13,7 @@ namespace DAL.Configuration
     {
         public static void RegisterDependencies(IServiceCollection services, string connection)
         {
-            services.AddDbContext<AppContext>(opt => opt.UseMySQL(connection));
+            services.AddDbContext<AppContext>(opt => opt.UseMySql(connection));
             services.AddScoped(typeof(IBaseRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAppContext, AppContext>();
@@ -54,7 +52,7 @@ namespace DAL.Configuration
                 Console.WriteLine(e);
             }
 
-            var builder = new DbContextOptionsBuilder<AppContext>().UseMySQL(connection);
+            var builder = new DbContextOptionsBuilder<AppContext>().UseMySql(connection);
             var context = new AppContext(builder.Options);
             context.Database.Migrate();
 

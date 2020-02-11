@@ -16,6 +16,9 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using WebApi.Configuration.Mapping;
 using WebApi.Configuration.Validation;
 using WebApi.Middleware;
@@ -64,6 +67,7 @@ namespace WebApi
                      policyBuilder.RequireClaim(ClaimTypes.Role, "user", "manager", "admin", "publisher", "moderator"));
             });
 
+            
             var mapper = mapConfig.CreateMapper();
             services.AddSingleton(mapper);
 
@@ -72,6 +76,7 @@ namespace WebApi
             services.AddMvc(opt =>
             {
                 opt.Filters.Add(new AuthorizeFilter(authPolicy));
+                
             })
                 .AddFluentValidation(opt => opt.RegisterValidatorsFromAssemblyContaining<CustomValidationInterceptor>());
             services.AddScoped<IValidator<GameViewDto>, GameValidator>();
@@ -82,6 +87,10 @@ namespace WebApi
             services.AddScoped<IValidator<UserViewDto>, UserValidator>();
             services.AddScoped<IValidator<OrderViewDto>, OrderValidator>();
             services.AddScoped<IValidatorInterceptor, CustomValidationInterceptor>();
+
+            services.AddSingleton<IAmazonDynamoDB>(provider => new AmazonDynamoDBClient(RegionEndpoint.EUWest2));
+            services.AddSingleton<IDynamoDBContext>(provider =>
+                new DynamoDBContext(provider.GetRequiredService<IAmazonDynamoDB>()));
 
             services.AddScoped<IAuthenticateService, AuthenticateService>();
             services.AddScoped<IOrderService, OrderService>();

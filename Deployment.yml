@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+  GameStoreApiInstanse:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0089b31e09ac3fffc
+      KeyName: !Ref GameStoreKeyPair
+  GameStoreSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      
+    
+
+Parameters:
+  GameStoreKeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Select the KeyPair
