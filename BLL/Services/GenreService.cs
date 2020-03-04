@@ -1,11 +1,10 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
-using DAL.Entities;
-using DAL.Exceptions;
+﻿using BLL.Interfaces;
 using DAL.Interfaces;
+using Domain.Dtos;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BLL.Services
@@ -13,69 +12,69 @@ namespace BLL.Services
     public class GenreService : IGenreService
     {
         private readonly IUnitOfWork _unit;
-        private readonly IMapper _mapper;
-        public GenreService(IUnitOfWork unit, IMapper mapper)
+        public GenreService(IUnitOfWork unit)
         {
-            _mapper = mapper;
             _unit = unit;
         }
-        public async Task<int> Create(GenreDto genre)
+        public async Task<int> Create(Genre genre)
         {
             if (genre == null)
                 throw new ArgumentNullException(nameof(genre));
-            var temp = _mapper.Map<Genre>(genre);
-            var resultGenre = await _unit.GenreRepository.Add(temp);
+            var createdEntity = await _unit.GenreRepository.Add(genre);
             await _unit.Commit();
-            return resultGenre.GenreId;
+            return createdEntity.GenreId;
         }
 
-        public async Task Edit(GenreDto genre)
+        public async Task Edit(int genreId, Genre genre)
         {
-            if (genre.GenreId < 0)
-                throw new ArgumentException("Id can not be less than 0.");
-            if (genre == null)
-                throw new ArgumentNullException(nameof(genre));
-            try
-            {
-                await _unit.GenreRepository.Update(genre.GenreId, _mapper.Map<Genre>(genre));
-            }
-            catch (EntryNotFoundException e)
-            {
-                throw new ArgumentException("Entry does not found.", e);
-            }
+            await _unit.GenreRepository.Update(genreId, genre);
             await _unit.Commit();
         }
 
         public async Task Delete(int id)
         {
-            if (id < 0)
-                throw new ArgumentException("Id can not be less than 0");
             await _unit.GenreRepository.Delete(id);
             await _unit.Commit();
         }
 
-        public async Task<GenreDto> GetById(int id)
+        public async Task<Genre> GetById(int id)
         {
-            if (id < 0)
-                throw new ArgumentException("Id can not be less than 0");
             var result = await _unit.GenreRepository.GetById(id);
-            if (result == null)
-                throw new EntryNotFoundException($"Entry with id = {id} does not found");
-            return _mapper.Map<GenreDto>(result);
+            return result;
         }
 
-        public async Task<IEnumerable<GenreDto>> GetAll()
+        public async Task<IList<Genre>> GetAll()
         {
             var result = await _unit.GenreRepository.GetAll();
-            return _mapper.Map<IEnumerable<GenreDto>>(result);
+            return result.ToList();
         }
 
-        public async Task<IList<GameDto>> GamesWithGenreId(int id)
+        public async Task<IList<GameDto>> GamesWithGenreId(int genreId)
         {
-            if (id < 0)
-                throw new ArgumentException("Id can not be less than 0");
-            var result = await _unit.GenreRepository.GamesWithGenreId(id);
-            return _mapper.Map<IList<GameDto>>(result);
+            var games = await _unit.GenreRepository.GamesWithGenreId(genreId);
+            var genres = await _unit.GenreRepository.GetAll();
+            var platforms = await _unit.PlatformRepository.GetAll();
+
+            var result = games.Select(p =>
+            {
+                var genresIds = p.GameGenres.Select(x => x.GenreId);
+                var platformsIds = p.PlatformTypes.Select(x => x.PlatformTypeId);
+
+                return new GameDto
+                {
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    DateOfAdding = p.DateOfAdding,
+                    AmountOfViews = p.AmountOfViews,
+                    GameId = p.GameId,
+                    Publisher = p.Publisher,
+                    GameGenres = genres.Where(x => genresIds.Contains(x.GenreId)).ToList(),
+                    PlatformTypes = platforms.Where(x => platformsIds.Contains(x.PlatformTypeId)).ToList()
+                };
+            }).ToList();
+
+            return result;
         }
     }
 }

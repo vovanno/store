@@ -1,16 +1,20 @@
 ﻿using CrossCuttingFunctionality.FilterModels;
-using DAL.Entities;
+using Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DAL.Interfaces
 {
-    public interface IGameRepository : IBaseRepository<Game>
+    public interface IGameRepository
     {
-        Task<IList<GameGenre>> GetGameGenres(int gameId);
+        Task<IList<Genre>> GetGameGenres(int gameId);
         Task LeaveComment(int gameId, Comment comment);
-        Task<IList<Comment>> GetCommentsByGameId(int gameId);
         Task<IList<Game>> GetGamesWithFilters(FilterModel filter);
-        Task AddGenresRange(int gameId, IList<Genre> genres);
+        Task AddGenresRange(int gameId, int[] genreIds);
+        Task<Game> GetById(int id);
+        Task<IList<Game>> GetAll();
+        Task<Game> Add(Game game, int[] genresIds, int[] platformsIds);
+        Task Update(int id, Game updatedEntity);
+        Task Delete(int id);
     }
 }

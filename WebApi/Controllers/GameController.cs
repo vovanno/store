@@ -1,14 +1,13 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
 using CrossCuttingFunctionality.FilterModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineStoreApi.CommentApi;
+using OnlineStoreApi.GenresApi;
 using System.Collections.Generic;
-using System.Net;
-using System.Security.Claims;
+using System.Linq;
 using System.Threading.Tasks;
-using WebApi.VIewDto;
+using OnlineStoreApi.GameApi;
 
 namespace WebApi.Controllers
 {
@@ -18,53 +17,53 @@ namespace WebApi.Controllers
     {
         private readonly IGameService _gameService;
         private readonly ICommentService _commentService;
-        private readonly IMapper _mapper;
 
-        public GameController(IGameService gameService, IMapper mapper, ICommentService commentService)
+        public GameController(IGameService gameService, ICommentService commentService)
         {
             _commentService = commentService;
             _gameService = gameService;
-            _mapper = mapper;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<GameViewDto>>> Get()
+        public async Task<ActionResult<List<GameResponse>>> Get()
         {
-            var gameList = await _gameService.GetAll();
-            var result = _mapper.Map<IEnumerable<GameViewDto>>(gameList);
-            return Ok(result);
+
+            var test = new List<GameResponse>();
+            var rr = test.SelectMany(p => p.Genres);
+
+            var pp = rr.Select(p => p.Name);
+
+            var gamesList = await _gameService.GetAll();
+            return Ok(gamesList.Select(p => p.ToGameResponse()));
         }
 
         [HttpGet]
         [Route("{id:int:min(1)}")]
         [AllowAnonymous]
-        public async Task<ActionResult> GetGame(int id)
+        public async Task<ActionResult<GameResponse>> GetGame(int id)
         {
-            var result = await _gameService.GetById(id);
-            return Ok(_mapper.Map<GameViewDto>(result));
+            var game = await _gameService.GetById(id);
+            return Ok(game.ToGameResponse());
         }
 
         [HttpPost]
-        [Authorize(Roles = "manager")]
-        public async Task<ActionResult> AddGame([FromBody] GameViewDto game)
+        //[Authorize(Roles = "manager")]
+        public async Task<ActionResult<int>> AddGame([FromBody] CreateGameRequest request)
         {
-            var createdGameId = await _gameService.Create(_mapper.Map<GameDto>(game));
+            var gameModel = request.ToGameModel();
+
+            var createdGameId = await _gameService.Create(gameModel, request.GenresIds, request.PlatformsIds);
             return Ok(createdGameId);
         }
 
-        [HttpPut]
+        [HttpPut("id:int:min(1)")]
         [Authorize(Roles = "manager, publisher")]
-        public async Task<ActionResult> EditGame(GameViewDto game)
+        public async Task<ActionResult> EditGame(int id, [FromBody] EditGameRequest request)
         {
-            var gameId = await _gameService.GetById(game.GameId);
-            var currentUser = (ClaimsIdentity)User.Identity;
-            var isPublisher = currentUser.FindFirst(p => p.Type == "PublisherId");
-            if (currentUser.RoleClaimType != "manager" && isPublisher.Value != gameId.PublisherId.ToString())
-            {
-                return Forbid();
-            }
-            await _gameService.Edit(_mapper.Map<GameDto>(game));
+            var gameModel = request.ToGameModel();
+
+            await _gameService.Edit(id, gameModel);
             return Ok();
         }
 
@@ -79,57 +78,58 @@ namespace WebApi.Controllers
         [HttpGet]
         [Route("{id:int:min(1)}/genres")]
         [AllowAnonymous]
-        public async Task<ActionResult> GetGameGenres(int id)
+        public async Task<ActionResult<List<GenreResponse>>> GetGameGenres(int id)
         {
-            var result = await _gameService.GetGameGenres(id);
-            return Ok(_mapper.Map<IList<GenreViewDto>>(result));
+            var gameGenres = await _gameService.GetGameGenres(id);
+            return Ok(gameGenres.Select(p => p.ToGenreResponse()));
         }
 
         [HttpPost]
         [Route("{id:int:min(1)}/comment")]
         [Authorize(Roles = "manager, user, publisher, moderator, admin")]
-        public async Task<ActionResult> LeaveComment(int id, CommentViewDto comment)
+        public async Task<ActionResult> LeaveComment(int id, CreateCommentRequest request)
         {
-            comment.GameId = id;
-            await _gameService.LeaveComment(id, _mapper.Map<CommentDto>(comment));
+            var commentModel = request.ToCommentModel();
+
+            await _gameService.LeaveComment(id, commentModel);
             return Ok();
         }
 
         [HttpGet]
-        [Route("{id:int:min(1)}/comments")]
+        [Route("{gameId:int:min(1)}/comments")]
         [AllowAnonymous]
-        public async Task<ActionResult> GetComments(int id)
+        public async Task<ActionResult<List<CommentResponse>>> GetComments(int gameId)
         {
-            var result = await _gameService.GetCommentsByGameId(id);
-            return Ok(_mapper.Map<IList<CommentViewDto>>(result));
+            var comments = await _gameService.GetCommentsByGameId(gameId);
+            return Ok(comments.Select(p => p.ToCommentResponse()));
         }
 
         [HttpGet]
         [Route("filters")]
         [AllowAnonymous]
-        public async Task<ActionResult> GetGamesWithFilters([FromQuery] FilterModel filter)
+        public async Task<ActionResult<List<GameResponse>>> GetGamesWithFilters([FromQuery] FilterModel filter)
         {
-            var result = await _gameService.GetGamesWithFilters(filter);
-            return Ok(_mapper.Map<IList<GameViewDto>>(result));
+            var games = await _gameService.GetGamesWithFilters(filter);
+            return Ok(games.Select(p => p.ToGameResponse()));
         }
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("{id:int:min(1)}/comments/filter")]
-        public async Task<ActionResult> GetCommentsWithFilters(int id, [FromQuery] FilterModel filter)
+        [Route("{gameId:int:min(1)}/comments/filter")]
+        public async Task<ActionResult> GetCommentsWithFilters(int gameId, [FromQuery] FilterModel filter)
         {
-            var result = await _commentService.GetCommentsWithFilters(id, filter);
-            return Ok(_mapper.Map<IList<CommentViewDto>>(result));
+            var comments = await _commentService.GetCommentsWithFilters(gameId, filter);
+            return Ok(comments.Select(p => p.ToCommentResponse()));
         }
 
-        [HttpPost]
-        [Authorize(Roles = "manager, publisher")]
-        [Route("{id:int:min(1)}/genres")]
-        public async Task<ActionResult> AddGenresRange(int id, [FromBody] IList<GenreViewDto> genres)
-        {
-            var tempGenres = _mapper.Map<IList<GenreDto>>(genres);
-            await _gameService.AddGenresRange(id, tempGenres);
-            return StatusCode((int)HttpStatusCode.Created);
-        }
+        //[HttpPost]
+        //[Authorize(Roles = "manager, publisher")]
+        //[Route("{id:int:min(1)}/genres")]
+        //public async Task<ActionResult> AddGenresRange(int id, [FromBody] IList<GenreViewDto> genres)
+        //{
+        //    var tempGenres = _mapper.Map<IList<Genre>>(genres);
+        //    await _gameService.AddGenresRange(id, tempGenres);
+        //    return StatusCode((int)HttpStatusCode.Created);
+        //}
     }
 }

@@ -1,10 +1,8 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
 using CrossCuttingFunctionality.FilterModels;
-using DAL.Entities;
-using DAL.Exceptions;
 using DAL.Interfaces;
+using Domain.Dtos;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,115 +13,96 @@ namespace BLL.Services
     public class GameService : IGameService
     {
         private readonly IUnitOfWork _unit;
-        private readonly IMapper _mapper;
-        public GameService(IUnitOfWork unit, IMapper mapper)
+        public GameService(IUnitOfWork unit)
         {
-            _mapper = mapper;
             _unit = unit;
         }
-        public async Task<int> Create(GameDto game)
+        public async Task<int> Create(Game game, int[] genresIds, int[] platformsIds)
         {
-            if (game == null)
-                throw new ArgumentNullException(nameof(game));
-            var gameGenres = game.Genres;
-            game.Genres = null;
-            var temp = _mapper.Map<Game>(game);
-            var resultGame = await _unit.GameRepository.Add(temp);
+            var createdGame = await _unit.GameRepository.Add(game, genresIds, platformsIds);
             await _unit.Commit();
-            await _unit.GameRepository.AddGenresRange(resultGame.GameId, _mapper.Map<IList<Genre>>(gameGenres));
-            await _unit.Commit();
-            return resultGame.GameId;
+            return createdGame.GameId;
         }
 
-        public async Task Edit(GameDto game)
+        public async Task Edit(int gameId, Game game)
         {
-            if (game.GameId < 0)
-                throw new ArgumentException("Id can not be less than 0.");
-            if (game == null)
-                throw new ArgumentNullException(nameof(game));
-            try
+            await _unit.GameRepository.Update(game.GameId, game);
+            await _unit.Commit();
+        }
+
+        public async Task Delete(int gameId)
+        {
+            await _unit.GameRepository.Delete(gameId);
+            await _unit.Commit();
+        }
+
+        public async Task<Game> GetById(int gameId)
+        {
+            var result = await _unit.GameRepository.GetById(gameId);
+            return result;
+        }
+
+        public async Task<List<GameDto>> GetAll()
+        {
+            var games = await _unit.GameRepository.GetAll();
+            var genres = await _unit.GenreRepository.GetAll();
+            var platforms = await _unit.PlatformRepository.GetAll();
+
+            var mappedGames = games.Select(p =>
             {
-                await _unit.GameRepository.Update(game.GameId, _mapper.Map<Game>(game));
-            }
-            catch (EntryNotFoundException e)
-            {
-                throw new ArgumentException("Entry does not found.", e);
-            }
+                var genresIds = p.GameGenres.Select(x => x.GenreId).ToList();
+                var platformsIds = p.PlatformTypes.Select(x => x.PlatformTypeId).ToList();
 
-            var tempGenres = _mapper.Map<IList<Genre>>(game.Genres);
-            await _unit.GameRepository.AddGenresRange(game.GameId, tempGenres);
-            await _unit.Commit();
+                return new GameDto
+                {
+                    GameId = p.GameId,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    DateOfAdding = p.DateOfAdding,
+                    AmountOfViews = p.AmountOfViews,
+                    Publisher = p.Publisher,
+                    Comments = p.Comments,
+                    PlatformTypes = platforms.Where(x => platformsIds.Contains(x.PlatformTypeId)).ToList(),
+                    GameGenres = genres.Where(x => genresIds.Contains(x.GenreId)).ToList()
+                };
+            }).ToList();
+            return mappedGames;
         }
 
-        public async Task Delete(int id)
+        public async Task<IList<Genre>> GetGameGenres(int gameId)
         {
-            if (id < 0)
-                throw new ArgumentException("Id can not be less than 0");
-            await _unit.GameRepository.Delete(id);
-            await _unit.Commit();
-        }
-
-        public async Task<GameDto> GetById(int id)
-        {
-            if (id < 0)
-                throw new ArgumentException("Id can not be less than 0");
-            var result = await _unit.GameRepository.GetById(id);
-            if (result == null)
-                throw new EntryNotFoundException($"Entry with id = {id} does not found");
-            return _mapper.Map<GameDto>(result);
-        }
-
-        public async Task<IEnumerable<GameDto>> GetAll()
-        {
-            var result = await _unit.GameRepository.GetAll();
-            return _mapper.Map<IEnumerable<GameDto>>(result);
-        }
-
-        public async Task<IList<GenreDto>> GetGameGenres(int gameId)
-        {
-            if (gameId < 0)
-                throw new ArgumentException("Id can not be less than 0");
             var result = await _unit.GameRepository.GetGameGenres(gameId);
-            return _mapper.Map<IList<GenreDto>>(result);
+            return result;
         }
 
-        public async Task LeaveComment(int id, CommentDto comment)
+        public async Task LeaveComment(int gameId, Comment comment)
         {
-            if (id < 0)
-                throw new ArgumentException("Id can not be less than 0");
-            if (comment == null)
-                throw new ArgumentNullException(nameof(comment));
-            var result = _mapper.Map<Comment>(comment);
-            await _unit.GameRepository.LeaveComment(id, result);
+            await _unit.GameRepository.LeaveComment(gameId, comment);
             await _unit.Commit();
         }
 
-        public async Task<IList<CommentDto>> GetCommentsByGameId(int gameId)
+        public async Task<IList<Comment>> GetCommentsByGameId(int gameId)
         {
-            if (gameId < 0)
-                throw new ArgumentException("Id can not be less than 0");
-            var result = await _unit.GameRepository.GetCommentsByGameId(gameId);
-            return _mapper.Map<IList<CommentDto>>(result);
+            var result = await _unit.CommentRepository.GetCommentsByGameId(gameId);
+            return result;
         }
 
-        public async Task<IList<GameDto>> GetGamesWithFilters(FilterModel filter)
+        public async Task<IList<Game>> GetGamesWithFilters(FilterModel filter)
         {
             var result = await _unit.GameRepository.GetGamesWithFilters(filter);
-            return _mapper.Map<IList<GameDto>>(result);
+            return result;
         }
 
-        public async Task AddGenresRange(int gameId, IList<GenreDto> genres)
+        public async Task AddGenresRange(int gameId, IList<Genre> genres)
         {
-            if (gameId < 0)
-                throw new ArgumentException("Id can not be less than 0.");
             if (!genres.Any())
                 return;
             if (genres.Any(p => p.GenreId < 1))
                 throw new ArgumentException("You can not add genres that does not exist.");
             if (genres.Any(p => p.GenreId == 2) && genres.Count > 1)
                 throw new ArgumentException("Game can have only default genre value or list of non-default genres.");
-            var tempGenres = _mapper.Map<IList<Genre>>(genres);
-            await _unit.GameRepository.AddGenresRange(gameId, tempGenres);
+            await _unit.GameRepository.AddGenresRange(gameId, genres.Select(p => p.GenreId).ToArray());
             await _unit.Commit();
         }
     }

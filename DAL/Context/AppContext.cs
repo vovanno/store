@@ -1,8 +1,8 @@
 ﻿using DAL.Interfaces;
 using DAL.ModelsConfiguration;
-using Microsoft.EntityFrameworkCore;
-using DAL.Entities;
+using Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Context
 {
@@ -21,11 +21,6 @@ namespace DAL.Context
         public AppContext(DbContextOptions options) : base(options)
         {
 
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseLazyLoadingProxies();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

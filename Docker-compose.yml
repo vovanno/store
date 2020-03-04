@@ -1,5 +1,10 @@
 version: '3.7'
 
 services:
-  db:
-  image:
+  database:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+  

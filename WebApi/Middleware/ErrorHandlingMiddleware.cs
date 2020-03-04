@@ -1,11 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using DAL.Exceptions;
+﻿using DAL.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using WebApi.VIewDto;
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace WebApi.Middleware
 {
@@ -51,12 +51,13 @@ namespace WebApi.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)code;
             Log.Error(e, "{}", e.Message);
-            var result = new ErrorDetails()
+            var result = new
             {
-                StatusCode = (int)code,
+                StatusCode = (int) code,
                 Message = errorMessage
-            }.ToString();
-            return context.Response.WriteAsync(result);
+            };
+            var jObject = JObject.FromObject(result);
+            return context.Response.WriteAsync(jObject.ToString());
         }
     }
 }

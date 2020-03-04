@@ -1,4 +1,4 @@
-﻿using DAL.Entities;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,9 +9,8 @@ namespace DAL.ModelsConfiguration
         public void Configure(EntityTypeBuilder<Order> builder)
         {
             builder.HasKey(p => p.OrderId);
+            builder.Property(p => p.OrderId).UseMySqlIdentityColumn();
             builder.Property(p => p.OrderDate).IsRequired();
-            builder.Property(p => p.Status).IsRequired();
-            builder.Property(p => p.ShippedDate);
         }
     }
 }

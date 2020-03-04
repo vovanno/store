@@ -1,59 +1,59 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using BLL.Services;
+﻿using BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using WebApi.VIewDto;
+using Microsoft.AspNetCore.Mvc;
+using OnlineStoreApi.CommentApi;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-    [Route("api/comments")]
+    [Route("api/comment")]
     [ApiController]
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
-        private readonly IMapper _mapper;
 
-        public CommentController(ICommentService commentService, IMapper mapper)
+        public CommentController(ICommentService commentService)
         {
             _commentService = commentService;
-            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CommentViewDto>>> Get()
+        public async Task<ActionResult<IEnumerable<CommentResponse>>> Get()
         {
-            var commentList = await _commentService.GetAll();
-            var result = _mapper.Map<IEnumerable<CommentViewDto>>(commentList);
-            return Ok(result);
+            var comments = await _commentService.GetAll();
+            var commentsResponse = comments.Select(p => p.ToCommentResponse());
+            return Ok(commentsResponse);
         }
 
         [HttpGet]
         [Route("{id:int:min(1)}")]
-        public async Task<ActionResult> GetComment(int id)
+        public async Task<ActionResult<CommentResponse>> GetComment(int id)
         {
-            var result = await _commentService.GetById(id);
-            return Ok(_mapper.Map<CommentViewDto>(result));
+            var comment = await _commentService.GetById(id);
+            return Ok(comment.ToCommentResponse());
         }
 
         [HttpPost]
-        [Route("{id:int:min(1)}/comment")]
-        public async Task<ActionResult> AddComment(int id, [FromBody] CommentViewDto comment)
+        public async Task<ActionResult<int>> AddComment(CreateCommentRequest request)
         {
-            comment.ParentId = id;
-            var createdCommentId = await _commentService.Create(_mapper.Map<CommentDto>(comment));
+            var commentModel = request.ToCommentModel();
+            commentModel.DateOfAdding = DateTime.UtcNow;
+
+            var createdCommentId = await _commentService.Create(commentModel);
             return Ok(createdCommentId);
         }
 
-        [HttpPut]
+        [HttpPut("{id:int:min(1)}")]
         [Authorize(Roles = "moderator")]
-        public async Task<ActionResult> EditComment([FromBody] CommentViewDto comment)
+        public async Task<ActionResult> EditComment(int id, [FromBody] EditCommentRequest request)
         {
-            await _commentService.Edit(_mapper.Map<CommentDto>(comment));
-            return Ok();
+            var commentModel = request.ToCommentModel();
+
+            await _commentService.Edit(id, commentModel);
+            return NoContent();
         }
 
         [HttpDelete]

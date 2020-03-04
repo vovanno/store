@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DAL.Entities;
 
 namespace DAL.ModelsConfiguration
 {
@@ -9,9 +9,9 @@ namespace DAL.ModelsConfiguration
         public void Configure(EntityTypeBuilder<Genre> builder)
         {
             builder.HasKey(p => p.GenreId);
+            builder.Property(p => p.GenreId).UseMySqlIdentityColumn();
             builder.HasIndex(p => p.Name).IsUnique();
             builder.Property(p => p.Name).HasMaxLength(30).IsRequired();
-            builder.HasQueryFilter(p => !p.IsDeleted);
             builder.HasData(
                 new Genre() { GenreId = 1, Name = "Strategy" },
                 new Genre() { GenreId = 2, Name = "RPG" },
@@ -31,10 +31,10 @@ namespace DAL.ModelsConfiguration
         public void Configure(EntityTypeBuilder<Genre.SubGenre> builder)
         {
             builder.HasKey(p => p.SubGenreId);
+            builder.Property(p => p.SubGenreId).UseMySqlIdentityColumn();
             builder.HasIndex(p => p.Name).IsUnique();
             builder.Property(p => p.Name).HasMaxLength(30).IsRequired();
             builder.Property(p => p.GenreId).IsRequired();
-            builder.HasQueryFilter(p => !p.IsDeleted);
             builder.HasData(
                 new Genre.SubGenre() { SubGenreId = 1, Name = "RTC", GenreId = 1 },
                 new Genre.SubGenre() { SubGenreId = 2, Name = "TBS", GenreId = 1 },

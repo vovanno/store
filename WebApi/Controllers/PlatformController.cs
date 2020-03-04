@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using BLL.DTO;
+﻿using System;
 using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using OnlineStoreApi.PlatformApi;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using WebApi.VIewDto;
 
 namespace WebApi.Controllers
 {
@@ -13,49 +13,50 @@ namespace WebApi.Controllers
     public class PlatformController : ControllerBase
     {
         private readonly IPlatformService _platformService;
-        private readonly IMapper _mapper;
 
-        public PlatformController(IPlatformService platformService, IMapper mapper)
+        public PlatformController(IPlatformService platformService)
         {
             _platformService = platformService;
-            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlatformViewDto>>> Get()
+        public async Task<ActionResult<List<PlatformResponse>>> Get()
         {
-            var platformList = await _platformService.GetAll();
-            var result = _mapper.Map<IEnumerable<PlatformViewDto>>(platformList);
-            return Ok(result);
+            var platformsList = await _platformService.GetAll();
+            return Ok(platformsList.Select(p => p.ToPlatformResponse()));
         }
 
         [HttpGet]
-        [Route("{id:int:min(1)}")]
-        public async Task<ActionResult> GetPlatform(int id)
+        [Route("{platformId:int:min(1)}")]
+        public async Task<ActionResult<PlatformResponse>> GetPlatform(int platformId)
         {
-            var result = await _platformService.GetById(id);
-            return Ok(_mapper.Map<PlatformViewDto>(result));
+            var platform = await _platformService.GetById(platformId);
+            return Ok(platform.ToPlatformResponse());
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddPlatform([FromBody] PlatformViewDto platform)
+        public async Task<ActionResult> AddPlatform([FromBody] CreatePlatformRequest request)
         {
-            var createdPlatformId = await _platformService.Create(_mapper.Map<PlatformTypeDto>(platform));
+            var platformModel = request.ToPlatformTypeModel();
+
+            var createdPlatformId = await _platformService.Create(platformModel);
             return Ok(createdPlatformId);
         }
 
-        [HttpPut]
-        public async Task<ActionResult> EditPlatform([FromBody] PlatformViewDto platform)
+        [HttpPut("{platformId:int:min(1)}")]
+        public async Task<ActionResult> EditPlatform(int platformId, [FromBody] EditPlatformRequest request)
         {
-            await _platformService.Edit(_mapper.Map<PlatformTypeDto>(platform));
+            var platformModel = request.ToPlatformTypeModel();
+
+            await _platformService.Edit(platformId, platformModel);
             return Ok();
         }
 
         [HttpDelete]
-        [Route("{id:int:min(1)}")]
-        public async Task<ActionResult> Delete(int id)
+        [Route("{platformId:int:min(1)}")]
+        public async Task<ActionResult> Delete(int platformId)
         {
-            await _platformService.Delete(id);
+            await _platformService.Delete(platformId);
             return Ok();
         }
     }

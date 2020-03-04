@@ -3,6 +3,7 @@ using System;
 using DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using AppContext = DAL.Context.AppContext;
 
@@ -18,10 +19,11 @@ namespace DAL.Migrations
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("DAL.Entities.Comment", b =>
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
                 {
                     b.Property<int>("CommentId")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AmountOfLikes");
 
@@ -48,10 +50,11 @@ namespace DAL.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Game", b =>
+            modelBuilder.Entity("Domain.Entities.Game", b =>
                 {
                     b.Property<int>("GameId")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AmountOfViews");
 
@@ -59,8 +62,6 @@ namespace DAL.Migrations
 
                     b.Property<string>("Description")
                         .HasMaxLength(500);
-
-                    b.Property<bool>("IsDeleted");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -77,7 +78,7 @@ namespace DAL.Migrations
                     b.ToTable("Games");
                 });
 
-            modelBuilder.Entity("DAL.Entities.GameGenre", b =>
+            modelBuilder.Entity("Domain.Entities.GameGenre", b =>
                 {
                     b.Property<int>("GameId");
 
@@ -90,7 +91,7 @@ namespace DAL.Migrations
                     b.ToTable("GameGenres");
                 });
 
-            modelBuilder.Entity("DAL.Entities.GamePlatform", b =>
+            modelBuilder.Entity("Domain.Entities.GamePlatform", b =>
                 {
                     b.Property<int>("GameId");
 
@@ -103,12 +104,11 @@ namespace DAL.Migrations
                     b.ToTable("GamePlatforms");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Genre", b =>
+            modelBuilder.Entity("Domain.Entities.Genre", b =>
                 {
                     b.Property<int>("GenreId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("IsDeleted");
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -125,67 +125,57 @@ namespace DAL.Migrations
                         new
                         {
                             GenreId = 1,
-                            IsDeleted = false,
                             Name = "Strategy"
                         },
                         new
                         {
                             GenreId = 2,
-                            IsDeleted = false,
                             Name = "RPG"
                         },
                         new
                         {
                             GenreId = 3,
-                            IsDeleted = false,
                             Name = "Sports"
                         },
                         new
                         {
                             GenreId = 4,
-                            IsDeleted = false,
                             Name = "Races"
                         },
                         new
                         {
                             GenreId = 5,
-                            IsDeleted = false,
                             Name = "Action"
                         },
                         new
                         {
                             GenreId = 6,
-                            IsDeleted = false,
                             Name = "Adventure"
                         },
                         new
                         {
                             GenreId = 7,
-                            IsDeleted = false,
                             Name = "Puzzle & Skills"
                         },
                         new
                         {
                             GenreId = 8,
-                            IsDeleted = false,
                             Name = "Misc"
                         },
                         new
                         {
                             GenreId = 9,
-                            IsDeleted = false,
                             Name = "Other"
                         });
                 });
 
-            modelBuilder.Entity("DAL.Entities.Genre+SubGenre", b =>
+            modelBuilder.Entity("Domain.Entities.Genre+SubGenre", b =>
                 {
                     b.Property<int>("SubGenreId")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("GenreId");
-
-                    b.Property<bool>("IsDeleted");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -205,87 +195,72 @@ namespace DAL.Migrations
                         {
                             SubGenreId = 1,
                             GenreId = 1,
-                            IsDeleted = false,
                             Name = "RTC"
                         },
                         new
                         {
                             SubGenreId = 2,
                             GenreId = 1,
-                            IsDeleted = false,
                             Name = "TBS"
                         },
                         new
                         {
                             SubGenreId = 3,
                             GenreId = 4,
-                            IsDeleted = false,
                             Name = "Rally"
                         },
                         new
                         {
                             SubGenreId = 4,
                             GenreId = 4,
-                            IsDeleted = false,
                             Name = "Arcade"
                         },
                         new
                         {
                             SubGenreId = 5,
                             GenreId = 4,
-                            IsDeleted = false,
                             Name = "Formula"
                         },
                         new
                         {
                             SubGenreId = 6,
                             GenreId = 4,
-                            IsDeleted = false,
                             Name = "Off-Road"
                         },
                         new
                         {
                             SubGenreId = 7,
                             GenreId = 5,
-                            IsDeleted = false,
                             Name = "FPS"
                         },
                         new
                         {
                             SubGenreId = 8,
                             GenreId = 5,
-                            IsDeleted = false,
                             Name = "TPS"
                         },
                         new
                         {
                             SubGenreId = 9,
                             GenreId = 5,
-                            IsDeleted = false,
                             Name = "Misc"
                         });
                 });
 
-            modelBuilder.Entity("DAL.Entities.Order", b =>
+            modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
                     b.Property<int>("OrderId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("IsDeleted");
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("OrderDate");
-
-                    b.Property<DateTime?>("ShippedDate");
-
-                    b.Property<string>("Status")
-                        .IsRequired();
 
                     b.HasKey("OrderId");
 
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("DAL.Entities.OrderGame", b =>
+            modelBuilder.Entity("Domain.Entities.OrderGame", b =>
                 {
                     b.Property<int>("OrderId");
 
@@ -298,12 +273,11 @@ namespace DAL.Migrations
                     b.ToTable("OrderGames");
                 });
 
-            modelBuilder.Entity("DAL.Entities.PlatformType", b =>
+            modelBuilder.Entity("Domain.Entities.PlatformType", b =>
                 {
                     b.Property<int>("PlatformTypeId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("IsDeleted");
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -317,12 +291,11 @@ namespace DAL.Migrations
                     b.ToTable("PlatformTypes");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Publisher", b =>
+            modelBuilder.Entity("Domain.Entities.Publisher", b =>
                 {
                     b.Property<int>("PublisherId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("IsDeleted");
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -339,7 +312,6 @@ namespace DAL.Migrations
                         new
                         {
                             PublisherId = 2,
-                            IsDeleted = false,
                             Name = "unknown"
                         });
                 });
@@ -501,64 +473,64 @@ namespace DAL.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Comment", b =>
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
                 {
-                    b.HasOne("DAL.Entities.Game", "Game")
+                    b.HasOne("Domain.Entities.Game", "Game")
                         .WithMany("Comments")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("DAL.Entities.Game", b =>
+            modelBuilder.Entity("Domain.Entities.Game", b =>
                 {
-                    b.HasOne("DAL.Entities.Publisher", "Publisher")
+                    b.HasOne("Domain.Entities.Publisher", "Publisher")
                         .WithMany("Games")
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("DAL.Entities.GameGenre", b =>
+            modelBuilder.Entity("Domain.Entities.GameGenre", b =>
                 {
-                    b.HasOne("DAL.Entities.Game", "Game")
+                    b.HasOne("Domain.Entities.Game", "Game")
                         .WithMany("GameGenres")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("DAL.Entities.Genre", "Genre")
+                    b.HasOne("Domain.Entities.Genre", "Genre")
                         .WithMany("GameGenres")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("DAL.Entities.GamePlatform", b =>
+            modelBuilder.Entity("Domain.Entities.GamePlatform", b =>
                 {
-                    b.HasOne("DAL.Entities.Game", "Game")
+                    b.HasOne("Domain.Entities.Game", "Game")
                         .WithMany("PlatformTypes")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("DAL.Entities.PlatformType", "PlatformType")
+                    b.HasOne("Domain.Entities.PlatformType", "PlatformType")
                         .WithMany("Games")
                         .HasForeignKey("PlatformTypeId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("DAL.Entities.Genre+SubGenre", b =>
+            modelBuilder.Entity("Domain.Entities.Genre+SubGenre", b =>
                 {
-                    b.HasOne("DAL.Entities.Genre", "Genre")
+                    b.HasOne("Domain.Entities.Genre", "Genre")
                         .WithMany("SubGenres")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("DAL.Entities.OrderGame", b =>
+            modelBuilder.Entity("Domain.Entities.OrderGame", b =>
                 {
-                    b.HasOne("DAL.Entities.Game", "Game")
+                    b.HasOne("Domain.Entities.Game", "Game")
                         .WithMany("OrderGames")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("DAL.Entities.Order", "Order")
+                    b.HasOne("Domain.Entities.Order", "Order")
                         .WithMany("OrdersGames")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade);

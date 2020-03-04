@@ -1,5 +1,6 @@
 ﻿using DAL.Interfaces;
 using System.Threading.Tasks;
+using DAL.Context;
 
 namespace DAL.Repositories
 {
@@ -12,9 +13,9 @@ namespace DAL.Repositories
         private IPublisherRepository _publisherRepository;
         private ISubGenreRepository _subGenreRepository;
         private IOrderRepository _orderRepository;
-        private readonly IAppContext _appContext;
+        private readonly AppContext _appContext;
 
-        public UnitOfWork(IAppContext context)
+        public UnitOfWork(AppContext context)
         {
             _appContext = context;
         }

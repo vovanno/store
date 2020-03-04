@@ -1,15 +1,15 @@
-﻿using BLL.DTO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Domain.Entities;
 
 namespace BLL.Interfaces
 {
     public interface IOrderService
     {
-        Task<int> AddOrder(OrderDto order);
-        Task EditOrder(int id, OrderDto order);
-        Task<IList<OrderDto>> GetAll();
-        Task<OrderDto> GetOrderById(int id);
-        Task<IList<OrderDto>> GetOrdersHistory();
+        Task<int> AddOrder(int[] gamesIds);
+        Task EditOrder(int id, int[] gamesIds);
+        Task<IList<Order>> GetAll();
+        Task<Order> GetOrderById(int id);
+        Task<IList<Order>> GetOrdersHistory();
     }
 }

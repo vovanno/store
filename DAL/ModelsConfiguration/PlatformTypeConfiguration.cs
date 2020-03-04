@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DAL.Entities;
 
 namespace DAL.ModelsConfiguration
 {
@@ -9,9 +9,13 @@ namespace DAL.ModelsConfiguration
         public void Configure(EntityTypeBuilder<PlatformType> builder)
         {
             builder.HasKey(p => p.PlatformTypeId);
+            builder.Property(p => p.PlatformTypeId).UseMySqlIdentityColumn();
             builder.HasIndex(p => p.Type).IsUnique();
             builder.Property(p => p.Type).HasMaxLength(30).IsRequired();
-            builder.HasQueryFilter(p => !p.IsDeleted);
+            builder.HasData(
+                new PlatformType{Type = "Windows", PlatformTypeId = 1},
+                new PlatformType{Type = "PlayStation", PlatformTypeId = 2},
+                new PlatformType {Type = "XBox", PlatformTypeId = 3});
         }
     }
 }

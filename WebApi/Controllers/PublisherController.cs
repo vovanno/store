@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using WebApi.VIewDto;
+using OnlineStoreApi.GameApi;
+using OnlineStoreApi.PublisherApi;
 
 namespace WebApi.Controllers
 {
@@ -14,62 +14,65 @@ namespace WebApi.Controllers
     public class PublisherController : ControllerBase
     {
         private readonly IPublisherService _publisherService;
-        private readonly IMapper _mapper;
 
-        public PublisherController(IPublisherService publisherService, IMapper mapper)
+        public PublisherController(IPublisherService publisherService)
         {
             _publisherService = publisherService;
-            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PublisherViewDto>>> Get()
+        public async Task<ActionResult<List<PublisherResponse>>> Get()
         {
-            var publisherList = await _publisherService.GetAll();
-            var result = _mapper.Map<IEnumerable<PublisherViewDto>>(publisherList);
-            return Ok(result);
+            var publishersList = await _publisherService.GetAll();
+            return Ok(publishersList.Select(p => p.ToPublisherResponse()));
         }
 
         [HttpGet]
-        [Route("{id:int:min(1)}")]
-        public async Task<ActionResult> GetPublisher(int id)
+        [Route("{publisherId:int:min(1)}")]
+        public async Task<ActionResult<PublisherResponse>> GetPublisher(int publisherId)
         {
-            var result = await _publisherService.GetById(id);
-            return Ok(_mapper.Map<PublisherViewDto>(result));
+            var result = await _publisherService.GetById(publisherId);
+            return Ok(result.ToPublisherResponse());
         }
 
         [HttpPost]
         [AllowAnonymous]
         //[Authorize(Roles = "manager")]
-        public async Task<ActionResult> AddPublisher([FromBody] PublisherViewDto publisher)
+        public async Task<ActionResult> AddPublisher([FromBody] CreatePublisherRequest request)
         {
-            var createdPublisherId = await _publisherService.Create(_mapper.Map<PublisherDto>(publisher));
+            var publisherModel = request.ToPublisherModel();
+
+            var createdPublisherId = await _publisherService.Create(publisherModel);
             return Ok(createdPublisherId);
         }
 
-        [HttpPut]
+        [HttpPut("{publisherId:int:min(1)}")]
         [Authorize(Roles = "publisher")]
-        public async Task<ActionResult> EditPublisher([FromBody] PublisherViewDto publisher)
+        public async Task<ActionResult> EditPublisher(int publisherId, [FromBody] EditPublisherRequest request)
         {
-            await _publisherService.Edit(_mapper.Map<PublisherDto>(publisher));
+            var publisherModel = request.ToPublisherModel();
+
+            await _publisherService.Edit(publisherId, publisherModel);
             return Ok();
         }
 
         [HttpDelete]
-        [Route("{id:int:min(1)}")]
+        [Route("{publisherId:int:min(1)}")]
         [Authorize(Roles = "manager")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int publisherId)
         {
-            await _publisherService.Delete(id);
+            await _publisherService.Delete(publisherId);
             return Ok();
         }
 
         [HttpGet]
-        [Route("{id:int:min(1)}/games")]
-        public async Task<ActionResult> GetGamesByPublisherId(int id)
+        [Route("{publisherId:int:min(1)}/games")]
+        [ProducesResponseType(typeof(List<GameResponse>), 200)]
+        public async Task<ActionResult<List<GameResponse>>> GetGamesByPublisherId(int publisherId)
         {
-            var result = await _publisherService.GetGamesByPublisherId(id);
-            return Ok(result);
+            var games = await _publisherService.GetGamesByPublisherId(publisherId);
+            var response = games.Select(p => p.ToGameResponse());
+            return Ok(response);
         }
     }
 }

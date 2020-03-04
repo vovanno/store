@@ -1,16 +1,22 @@
-﻿using BLL.DTO;
-using CrossCuttingFunctionality.FilterModels;
+﻿using CrossCuttingFunctionality.FilterModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Domain.Dtos;
+using Domain.Entities;
 
 namespace BLL.Interfaces
 {
-    public interface IGameService : IBaseService<GameDto>
+    public interface IGameService
     {
-        Task<IList<GenreDto>> GetGameGenres(int gameId);
-        Task LeaveComment(int id, CommentDto comment);
-        Task<IList<CommentDto>> GetCommentsByGameId(int gameId);
-        Task<IList<GameDto>> GetGamesWithFilters(FilterModel filter);
-        Task AddGenresRange(int gameId, IList<GenreDto> genres);
+        Task<IList<Genre>> GetGameGenres(int gameId);
+        Task LeaveComment(int id, Comment comment);
+        Task<IList<Comment>> GetCommentsByGameId(int gameId);
+        Task<IList<Game>> GetGamesWithFilters(FilterModel filter);
+        Task AddGenresRange(int gameId, IList<Genre> genres);
+        Task<int> Create(Game game, int[] genresIds, int[] platformsIds);
+        Task Edit(int id, Game entity);
+        Task Delete(int id);
+        Task<Game> GetById(int id);
+        Task<List<GameDto>> GetAll();
     }
 }

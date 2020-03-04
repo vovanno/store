@@ -30,7 +30,7 @@ namespace BLL.Services
                 "publisher",
                 "moderator"
             };
-            if (!role.Contains(role))
+            if (!roles.Contains(role))
                 throw new ArgumentException("Such role does not exist, please choose role from the list.");
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)

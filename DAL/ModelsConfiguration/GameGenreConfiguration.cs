@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using DAL.Entities;
 
 namespace DAL.ModelsConfiguration
 {
@@ -13,7 +13,8 @@ namespace DAL.ModelsConfiguration
             builder.Property(p => p.GenreId).IsRequired();
             builder.HasOne(gg => gg.Game)
                 .WithMany(p => p.GameGenres)
-                .HasForeignKey(gg => gg.GameId);
+                .HasForeignKey(gg => gg.GameId)
+                .OnDelete(DeleteBehavior.Cascade);
             builder.HasOne(gg => gg.Genre)
                 .WithMany(p => p.GameGenres)
                 .HasForeignKey(gg => gg.GenreId);

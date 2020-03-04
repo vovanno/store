@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using OnlineStoreApi.GenresApi;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using WebApi.VIewDto;
+using OnlineStoreApi.GameApi;
 
 namespace WebApi.Controllers
 {
@@ -13,41 +13,43 @@ namespace WebApi.Controllers
     public class GenreController : ControllerBase
     {
         private readonly IGenreService _genreService;
-        private readonly IMapper _mapper;
 
-        public GenreController(IGenreService gameService, IMapper mapper)
+        public GenreController(IGenreService gameService)
         {
             _genreService = gameService;
-            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GenreViewDto>>> Get()
+        public async Task<ActionResult<IEnumerable<GenreResponse>>> Get()
         {
-            var gameList = await _genreService.GetAll();
-            var result = _mapper.Map<IEnumerable<GenreViewDto>>(gameList);
-            return Ok(result);
+            var genresList = await _genreService.GetAll();
+
+            return Ok(genresList.Select(p => p.ToGenreResponse()));
         }
 
         [HttpGet]
         [Route("{id:int:min(1)}")]
-        public async Task<ActionResult> GetGenre(int id)
+        public async Task<ActionResult<GenreResponse>> GetGenre(int id)
         {
-            var result = await _genreService.GetById(id);
-            return Ok(_mapper.Map<GenreViewDto>(result));
+            var genre = await _genreService.GetById(id);
+            return Ok(genre.ToGenreResponse());
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddGenre(GenreViewDto game)
+        public async Task<ActionResult<int>> AddGenre(CreateGenreRequest request)
         {
-            var createdGenreId = await _genreService.Create(_mapper.Map<GenreDto>(game));
+            var genreModel = request.ToGenreModel();
+
+            var createdGenreId = await _genreService.Create(genreModel);
             return Ok(createdGenreId);
         }
 
-        [HttpPut]
-        public async Task<ActionResult> EditGenre(GenreViewDto game)
+        [HttpPut("id:int:min(1)")]
+        public async Task<ActionResult> EditGenre(int id, [FromBody] EditGenreRequest request)
         {
-            await _genreService.Edit(_mapper.Map<GenreDto>(game));
+            var genreModel = request.ToGenreModel();
+
+            await _genreService.Edit(id, genreModel);
             return Ok();
         }
 
@@ -60,10 +62,10 @@ namespace WebApi.Controllers
 
         [HttpGet]
         [Route("{id:int:min(1)}/games")]
-        public async Task<ActionResult> GamesWithGenreId(int id)
+        public async Task<ActionResult<List<GameResponse>>> GamesWithGenreId(int id)
         {
             var result = await _genreService.GamesWithGenreId(id);
-            return Ok(_mapper.Map<IList<GameViewDto>>(result));
+            return Ok(result.Select(p => p.ToGameResponse()));
         }
     }
 }
