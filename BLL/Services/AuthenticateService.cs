@@ -34,10 +34,10 @@ namespace BLL.Services
             await _userManager.AddClaimAsync(addedUser, new Claim(ClaimTypes.Name, userProfile.UserName));
             await _userManager.AddClaimAsync(addedUser, new Claim(ClaimTypes.Email, userProfile.Email));
             if (!userProfile.IsPublisher) return result;
-            var createdPublisherId = await _unit.PublisherRepository.Add(new Publisher() { Name = userProfile.UserName });
+            var createdPublisherId = await _unit.ManufacturerRepository.Add(new Manufacturer() { Name = userProfile.UserName });
             await _unit.Commit();
             await _userManager.AddClaimAsync(addedUser,
-                new Claim("PublisherId", createdPublisherId.ToString()));
+                new Claim("ManufacturerId", createdPublisherId.ToString()));
             return result;
         }
 

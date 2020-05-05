@@ -14,36 +14,35 @@ namespace DAL.Repositories
 {
     internal sealed class CommentRepository : ICommentRepository
     {
-        private readonly AppContext _context;
-        public CommentRepository(AppContext context)
+        private readonly StoreContext _context;
+        public CommentRepository(StoreContext context)
         {
             _context = context;
         }
 
-        public async Task<IList<Comment>> GetCommentsWithFilters(int gameId, FilterModel filter)
+        public async Task<IList<Comment>> GetCommentsWithFilters(int productId, FilterModel filter)
         {
             List<Comment> result = null;
             if (filter.ByDateAscending)
             {
-                result = await _context.Comments.AsNoTracking().Where(p => p.GameId == gameId).OrderBy(p => p.DateOfAdding).ToListAsync();
+                result = await _context.Comments.AsNoTracking().Where(p => p.ProductId == productId).OrderBy(p => p.DateOfAdding).ToListAsync();
             }
             else if (filter.ByDateDescending)
             {
-                result = await _context.Comments.AsNoTracking().Where(p => p.GameId == gameId).OrderByDescending(p => p.AmountOfLikes).ToListAsync();
+                result = await _context.Comments.AsNoTracking().Where(p => p.ProductId == productId).OrderByDescending(p => p.AmountOfLikes).ToListAsync();
             }
             else if (filter.IsMostPopular)
             {
-                result = await _context.Comments.Where(p => p.GameId == gameId).OrderBy(p => p.AmountOfLikes).ToListAsync();
+                result = await _context.Comments.Where(p => p.ProductId == productId).OrderBy(p => p.AmountOfLikes).ToListAsync();
             }
 
             return result?.Skip((filter.Page - 1) * filter.Size).Take(filter.Size).ToList();
         }
 
-        public async Task<IList<Comment>> GetCommentsByGameId(int gameId)
+        public async Task<IList<Comment>> GetCommentsByProductId(int productId)
         {
             return await _context.Comments.FromSql(
-                "SELECT CommentId, Name, Body, AmountOfViews, DateOfAdding, ParentCommentId FROM Comments" +
-                "WHERE GameId=@gameId", new MySqlParameter("@gameId", gameId)).ToListAsync();
+                "SELECT * FROM Comments WHERE ProductId=@productId", new MySqlParameter("@productId", productId)).ToListAsync();
         }
 
         public async Task<Comment> GetById(int commentId)
@@ -63,7 +62,7 @@ namespace DAL.Repositories
 
         public async Task<Comment> Add(Comment comment)
         {
-            var createdComment = await _context.AddAsync(comment);
+            var createdComment = await _context.Comments.AddAsync(comment);
             return createdComment.Entity;
         }
 
@@ -79,8 +78,8 @@ namespace DAL.Repositories
 
         public async Task Delete(int commentId)
         {
-            await _context.Database.ExecuteSqlCommandAsync("DELETE FROM Genres WHERE GenreId=@genreId",
-                new MySqlParameter("@genreId", commentId));
+            await _context.Database.ExecuteSqlCommandAsync("DELETE FROM Categories WHERE CategoryId=@commentId",
+                new MySqlParameter("@commentId", commentId));
         }
     }
 }

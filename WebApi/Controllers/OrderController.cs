@@ -20,10 +20,10 @@ namespace WebApi.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "user, manager, admin, moderator")]
-        public async Task<IActionResult> AddOrder([FromBody] CreateOrderRequest request)
+        public async Task<ActionResult<int>> AddOrder([FromBody] CreateOrderRequest request)
         {
-            var orderedGamesIds = request.GameIds;
-            var orderId = await _orders.AddOrder(orderedGamesIds);
+            var orderedProductsIds = request.ProductsIds;
+            var orderId = await _orders.AddOrder(orderedProductsIds);
 
             if (orderId == 0)
                 return BadRequest("You can not make an order for a non-existent game");
@@ -33,19 +33,19 @@ namespace WebApi.Controllers
 
         [HttpPut]
         [Route("{orderId:int:min(1)}")]
-        [Authorize(Roles = "manager")]
+        //[Authorize(Roles = "manager")]
         public async Task<IActionResult> EditOrder(int orderId, [FromBody] EditOrderRequest request)
         {
-            await _orders.EditOrder(orderId, request.GameIds);
+            await _orders.EditOrder(orderId, request.ProductsIds);
             return NoContent();
         }
 
         [HttpGet]
-        [Authorize(Roles = "manager")]
+        //[Authorize(Roles = "manager")]
         public async Task<ActionResult<List<OrderResponse>>> GetAllOrders()
         {
             var orders = await _orders.GetAll();
-            return Ok(orders);
+            return Ok(orders.ToOrderResponse());
         }
 
         [HttpGet]
@@ -54,16 +54,16 @@ namespace WebApi.Controllers
         public async Task<ActionResult<List<OrderResponse>>> GetOrdersHistory()
         {
             var ordersHistory = await _orders.GetOrdersHistory();
-            return Ok(ordersHistory);
+            return Ok(ordersHistory.ToOrderResponse());
         }
 
         [HttpGet]
         [Route("{id:int:min(1)}")]
-        [Authorize(Roles = "user, manager")]
+        //[Authorize(Roles = "user, manager")]
         public async Task<ActionResult<OrderResponse>> GetOrderById(int id)
         {
             var order = await _orders.GetOrderById(id);
-            return Ok(order);
+            return Ok(order.ToOrderResponse());
         }
     }
 }

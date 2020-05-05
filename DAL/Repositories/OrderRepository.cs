@@ -12,16 +12,27 @@ namespace DAL.Repositories
 {
     internal class OrderRepository : IOrderRepository
     {
-        private readonly Context.AppContext _context;
+        private readonly Context.StoreContext _context;
 
-        public OrderRepository(Context.AppContext context)
+        public OrderRepository(Context.StoreContext context)
         {
             _context = context;
         }
 
         public async Task<Order> GetById(int orderId)
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(p => p.OrderId == orderId);
+            var order = await _context.Orders.Where(p => p.OrderId == orderId)
+                .Include(p => p.Products)
+                    .ThenInclude(p => p.Product)
+                        .ThenInclude(p => p.Manufacturer)
+                .Include(p => p.Products)
+                    .ThenInclude(p => p.Product)
+                        .ThenInclude(p => p.Category)
+                .Include(p => p.Products)
+                    .ThenInclude(p => p.Product)
+                        .ThenInclude(p => p.Images)
+                .FirstOrDefaultAsync();
+
             return order ?? throw new EntryNotFoundException($"Order with OrderId={orderId} was not found");
         }
 
@@ -36,17 +47,14 @@ namespace DAL.Repositories
             return createdOrder.Entity;
         }
 
-        public async Task Update(int orderId, int[] gamesIds)
+        public async Task Update(int orderId, List<Product> products)
         {
             var foundOrder = await _context.Orders.FirstOrDefaultAsync(p => p.OrderId == orderId);
 
             if(foundOrder == null)
                 throw new EntryNotFoundException($"Order with OrderId={orderId} was not found");
 
-            var orderGames = gamesIds.Select(p => new OrderGame {GameId = p, OrderId = orderId}).ToList();
-            foundOrder.OrdersGames = orderGames;
-
-            _context.Orders.Update(foundOrder);
+            //foundOrder.Products = products;
         }
 
         public async Task Delete(int orderId)

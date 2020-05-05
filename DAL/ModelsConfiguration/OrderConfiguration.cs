@@ -11,6 +11,7 @@ namespace DAL.ModelsConfiguration
             builder.HasKey(p => p.OrderId);
             builder.Property(p => p.OrderId).UseMySqlIdentityColumn();
             builder.Property(p => p.OrderDate).IsRequired();
+            builder.Property(p => p.Status).IsRequired(false);
         }
     }
 }

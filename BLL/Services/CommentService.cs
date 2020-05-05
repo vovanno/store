@@ -11,9 +11,15 @@ namespace BLL.Services
     public class CommentService : ICommentService
     {
         private readonly IUnitOfWork _unit;
+
         public CommentService(IUnitOfWork unit)
         {
             _unit = unit;
+        }
+
+        public async Task<IList<Comment>> GetCommentsByProductId(int productId)
+        {
+            return await _unit.CommentRepository.GetCommentsByProductId(productId);
         }
 
         public async Task<int> Create(Comment comment)
@@ -23,21 +29,21 @@ namespace BLL.Services
             return createdComment.CommentId;
         }
 
-        public async Task Edit(int id, Comment comment)
+        public async Task Edit(int commentId, Comment comment)
         {
-            await _unit.CommentRepository.Update(comment.CommentId, comment);
+            await _unit.CommentRepository.Update(commentId, comment);
             await _unit.Commit();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(int commentId)
         {
-            await _unit.CommentRepository.Delete(id);
+            await _unit.CommentRepository.Delete(commentId);
             await _unit.Commit();
         }
 
-        public async Task<Comment> GetById(int id)
+        public async Task<Comment> GetById(int commentId)
         {
-            var result = await _unit.CommentRepository.GetById(id);
+            var result = await _unit.CommentRepository.GetById(commentId);
             return result;
         }
 
@@ -47,10 +53,9 @@ namespace BLL.Services
             return result.ToList();
         }
 
-        public async Task<IList<Comment>> GetCommentsWithFilters(int gameId, FilterModel filter)
+        public async Task<IList<Comment>> GetCommentsWithFilters(int productId, FilterModel filter)
         {
-            var result = await _unit.CommentRepository.GetCommentsWithFilters(gameId, filter);
-            return result;
+            return await _unit.CommentRepository.GetCommentsWithFilters(productId, filter);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using OnlineStoreApi.GameApi;
+using OnlineStoreApi.ProductApi;
 
 namespace OnlineStoreApi.OrdersApi
 {
@@ -8,8 +8,7 @@ namespace OnlineStoreApi.OrdersApi
     {
         public int OrderId { get; set; }
         public DateTime OrderDate { get; set; }
-        public virtual List<GameResponse> OrderedGames { get; set; }
+        public virtual List<ProductResponse> OrderedProducts { get; set; }
         public string Status { get; set; }
-        public DateTime? ShippedDate { get; set; }
     }
 }

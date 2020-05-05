@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Entities;
 
 namespace Domain
 {
@@ -22,7 +23,7 @@ namespace Domain
             {
                 dynamic argumentValue = prop.GetValue(source);
 
-                if(argumentValue == null)
+                if (argumentValue == null)
                     continue;
 
                 var argumentType = argumentValue.GetType();
@@ -35,6 +36,24 @@ namespace Domain
             }
 
             return sqlParameters.Any() ? sqlParameters : null;
+        }
+
+        public static void CountRatingForProduct(this Product product)
+        {
+            if (product.Comments == null || product.Comments.Count == 0)
+            {
+                product.Rating = 0;
+                return;
+            }
+
+            product.Rating = product.Comments
+                .Where(x => x.ParentCommentId == 0 )
+                .Select(x => x.ProductRating).Average();
+        }
+
+        public static void CountRatingForProducts(this List<Product> products)
+        {
+            products.ForEach(CountRatingForProduct);
         }
     }
 }

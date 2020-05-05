@@ -70,12 +70,10 @@ namespace WebApi
 
             services.AddScoped<IAuthenticateService, AuthenticateService>();
             services.AddScoped<IOrderService, OrderService>();
-            services.AddScoped<IGameService, GameService>();
-            services.AddScoped<IGenreService, GenreService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ICommentService, CommentService>();
-            services.AddScoped<IPlatformService, PlatformTypeService>();
-            services.AddScoped<IPublisherService, PublisherService>();
-            services.AddScoped<ISubGenreService, SubGenreService>();
+            services.AddScoped<IManufacturerService, ManufacturerService>();
             BLL.Configuration.Configuration.RegisterDependencies(services, Configuration.GetConnectionString("DefaultConnection"));
             services.AddSwaggerGen(options =>
                 options.SwaggerDoc("v1", new Info { Title = "Online GameStore", Version = "v1" })

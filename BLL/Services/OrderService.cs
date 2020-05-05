@@ -17,36 +17,27 @@ namespace BLL.Services
             _unit = unit;
         }
 
-        public async Task<int> AddOrder(int[] gamesIds)
+        public async Task<int> AddOrder(int[] productIds)
         {
+            var foundProducts = await CheckProductsAvailability(productIds);
             var utcNow = DateTime.UtcNow;
-            var orderRequest = new Order { OrderDate = utcNow };
 
-            //Create order without games, in order to receive orderId.
+            var orderRequest = new Order { OrderDate = utcNow };
             var order = await _unit.OrderRepository.Add(orderRequest);
+
+            var products = foundProducts.Select(p => new OrdersProduct { OrderId = order.OrderId, ProductId = p.ProductId }).ToList();
+            order.Products = products;
+
             await _unit.Commit();
 
-            //Try add games to the created order, and update order entity.
-            await _unit.OrderRepository.Update(order.OrderId, gamesIds);
-            try
-            {
-                await _unit.Commit();
-            }
-            catch (Exception)
-            {
-                await _unit.OrderRepository.Delete(order.OrderId);
-                await _unit.Commit();
-                return 0;
-            }
             return order.OrderId;
         }
 
-        public async Task EditOrder(int id, int[] gamesIds)
+        public async Task EditOrder(int orderId, int[] productsIds)
         {
-            if (!gamesIds.Any())
-                return;
+            var products = await CheckProductsAvailability(productsIds);
 
-            await _unit.OrderRepository.Update(id, gamesIds);  
+            await _unit.OrderRepository.Update(orderId, products);
             await _unit.Commit();
         }
 
@@ -62,12 +53,26 @@ namespace BLL.Services
             return result.ToList();
         }
 
-        public async Task<Order> GetOrderById(int id)
+        public async Task<Order> GetOrderById(int orderId)
         {
-            if (id < 0)
-                throw new ArgumentException("Id can not be less than 0");
-            var tempOrder = await _unit.OrderRepository.GetById(id);
+            var tempOrder = await _unit.OrderRepository.GetById(orderId);
             return tempOrder;
+        }
+
+        private async Task<List<Product>> CheckProductsAvailability(int[] productIds)
+        {
+            var foundProducts = await _unit.ProductRepository.GetProductsByIds(productIds);
+
+            if (foundProducts.Count != productIds.Length)
+                throw new ArgumentException(nameof(productIds));
+
+            foreach (var product in foundProducts)
+            {
+                if (!product.Availability)
+                    throw new ArgumentException(nameof(productIds));
+            }
+
+            return foundProducts;
         }
     }
 }

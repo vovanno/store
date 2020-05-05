@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using Domain;
 using Domain.Entities;
 using OnlineStoreApi.AuthApi;
 using OnlineStoreApi.CommentApi;
-using OnlineStoreApi.GameApi;
-using OnlineStoreApi.GenresApi;
-using OnlineStoreApi.PlatformApi;
-using OnlineStoreApi.PublisherApi;
-using OnlineStoreApi.SubGenreApi;
+using System.Collections.Generic;
 using System.Linq;
-using Domain;
-using Domain.Dtos;
+using OnlineStoreApi.CategoryApi;
+using OnlineStoreApi.ManufactureApi;
+using OnlineStoreApi.OrdersApi;
+using OnlineStoreApi.ProductApi;
 
 namespace WebApi
 {
@@ -19,9 +17,9 @@ namespace WebApi
         {
             return new CommentResponse
             {
-                GameId = comment.GameId,
+                ProductId = comment.ProductId,
                 CommentId = comment.CommentId,
-                Name = comment.Name,
+                ProductRating = comment.ProductRating,
                 DateOfAdding = comment.DateOfAdding,
                 AmountOfLikes = comment.AmountOfLikes,
                 Body = comment.Body,
@@ -33,13 +31,13 @@ namespace WebApi
         {
             return comments.EmptyIfNull().Select(p => new CommentResponse
             {
-                Name = p.Name,
                 AmountOfLikes = p.AmountOfLikes,
                 Body = p.Body,
+                ProductRating = p.ProductRating,
                 DateOfAdding = p.DateOfAdding,
                 CommentId = p.CommentId,
                 ParentId = p.CommentId,
-                GameId = p.GameId
+                ProductId = p.ProductId
             }).ToList();
         }
 
@@ -48,7 +46,8 @@ namespace WebApi
             return new Comment
             {
                 Body = request.Body,
-                GameId = request.GameId,
+                ProductRating = request.ProductRating,
+                ProductId = request.ProductId,
                 ParentCommentId = request.ParentId
             };
         }
@@ -79,171 +78,122 @@ namespace WebApi
             };
         }
 
-        public static GameResponse ToGameResponse(this Game game)
+        public static ProductResponse ToProductResponse(this Product product)
         {
-            return new GameResponse
+            return new ProductResponse
             {
-                GameId = game.GameId,
-                DateOfAdding = game.DateOfAdding,
-                Name = game.Name,
-                AmountOfViews = game.AmountOfViews,
-                Price = game.Price,
-                Description = game.Description,
-                Genres = game.GameGenres == null ? null : game.GameGenres.Select(p => p.Genre.ToGenreResponse()).ToList()
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Price = product.Price,
+                Description = product.Description,
+                Availability = product.Availability,
+                Rating = product.Rating,
+                Category = product.Category.ToCategoryResponse(),
+                Manufacturer = product.Manufacturer.ToManufacturerResponse(),
+                Comments = product.Comments.ToCommentResponse()
             };
         }
 
-        public static GameResponse ToGameResponse(this GameDto game)
+        public static ManufacturerResponse ToManufacturerResponse(this Manufacturer publisher)
         {
-            return new GameResponse
-            {
-                Name = game.Name,
-                GameId = game.GameId,
-                DateOfAdding = game.DateOfAdding,
-                Description = game.Description,
-                Price = game.Price,
-                AmountOfViews = game.AmountOfViews,
-                Publisher = game.Publisher.ToPublisherResponse(),
-                Genres = game.GameGenres.ToGenreResponse(),
-                Comments = game.Comments.ToCommentResponse()
-            };
-        }
-
-        public static PublisherResponse ToPublisherResponse(this Publisher publisher)
-        {
-            return new PublisherResponse
+            return new ManufacturerResponse
             {
                 Name = publisher.Name,
-                PublisherId = publisher.PublisherId
+                ManufacturerId = publisher.ManufacturerId
             };
         }
 
-        public static Game ToGameModel(this CreateGameRequest request)
+        public static Product ToProductModel(this CreateProductRequest request)
         {
-            return new Game
+            return new Product
             {
                 Description = request.Description,
                 Name = request.Name,
-                //GenreIds = request.GenresIds,
-                //PlatformIds = request.PlatformsIds,
-                PublisherId = request.PublisherId,
-                Price = request.Price
+                Availability = request.Availability,
+                ManufacturerId = request.ManufacturerId,
+                Price = request.Price,
+                CategoryId = request.CategoryId,
             };
         }
 
-        public static Game ToGameModel(this EditGameRequest request)
+        public static Product ToProductModel(this EditProductRequest request)
         {
-            return new Game
+            return new Product
             {
                 Description = request.Description,
                 Name = request.Name,
-                //GenreIds = request.GenresIds,
-                //PlatformIds = request.PlatformsIds,
-                PublisherId = request.PublisherId,
-                Price = request.Price
+                Availability = request.Availability,
+                ManufacturerId = request.ManufacturerId,
+                Price = request.Price,
+                CategoryId = request.CategoryId,
             };
         }
 
-        public static GenreResponse ToGenreResponse(this Genre genre)
+        public static CategoryResponse ToCategoryResponse(this Category category)
         {
-            return new GenreResponse
+            return new CategoryResponse
             {
-                Name = genre.Name,
-                GenreId = genre.GenreId
+                Name = category.Name,
+                CategoryId = category.CategoryId
             };
         }
 
-        public static List<GenreResponse> ToGenreResponse(this IList<Genre> gameGenre)
+        public static List<CategoryResponse> ToCategoryResponse(this IList<Category> gameGenre)
         {
-            return gameGenre.EmptyIfNull().Select(p => new GenreResponse
+            return gameGenre.EmptyIfNull().Select(p => new CategoryResponse
             {
                 Name = p.Name,
-                GenreId = p.GenreId
+                CategoryId = p.CategoryId
             }).ToList();
         }
 
-        public static Genre ToGenreModel(this CreateGenreRequest request)
+        public static Category ToCategoryModel(this CreateCategoryRequest request)
         {
-            return new Genre
+            return new Category
             {
                 Name = request.Name
             };
         }
 
-        public static Genre ToGenreModel(this EditGenreRequest request)
+        public static Category ToCategoryModel(this EditCategoryRequest request)
         {
-            return new Genre
+            return new Category
             {
                 Name = request.Name
             };
         }
 
-        public static Publisher ToPublisherModel(this CreatePublisherRequest request)
+        public static Manufacturer ToManufacturerModel(this CreateManufacturerRequest request)
         {
-            return new Publisher
+            return new Manufacturer
             {
                 Name = request.Name
             };
         }
 
-        public static Publisher ToPublisherModel(this EditPublisherRequest request)
+        public static Manufacturer ToManufacturerModel(this EditManufacturerRequest request)
         {
-            return new Publisher
+            return new Manufacturer
             {
                 Name = request.Name
             };
         }
 
-        public static SubGenreResponse ToSubGenreResponse(this Genre.SubGenre subGenre)
+        public static OrderResponse ToOrderResponse(this Order order)
         {
-            return new SubGenreResponse
+            return new OrderResponse
             {
-                Name = subGenre.Name,
-                Id = subGenre.SubGenreId,
-                GenreId = subGenre.GenreId
+                OrderId = order.OrderId,
+                OrderDate = order.OrderDate,
+                Status = order.Status,
+                OrderedProducts = order.Products.Select(p => p.Product.ToProductResponse()).ToList()
             };
         }
 
-        public static Genre.SubGenre ToSubGenre(this CreateSubGenreRequest request)
+        public static List<OrderResponse> ToOrderResponse(this IList<Order> orders)
         {
-            return new Genre.SubGenre
-            {
-                Name = request.Name,
-                GenreId = request.GenreId
-            };
-        }
-        public static Genre.SubGenre ToSubGenre(this EditSubGenreRequest request)
-        {
-            return new Genre.SubGenre
-            {
-                Name = request.Name,
-                GenreId = request.GenreId
-            };
+            return orders.Select(p => p.ToOrderResponse()).ToList();
         }
 
-        public static PlatformType ToPlatformTypeModel(this CreatePlatformRequest request)
-        {
-            return new PlatformType
-            {
-                Type = request.Name
-            };
-        }
-
-        public static PlatformType ToPlatformTypeModel(this EditPlatformRequest request)
-        {
-            return new PlatformType
-            {
-                Type = request.Name
-            };
-        }
-
-        public static PlatformResponse ToPlatformResponse(this PlatformType platform)
-        {
-            return new PlatformResponse
-            {
-                PlatformTypeId = platform.PlatformTypeId,
-                Type = platform.Type
-            };
-        }
     }
 }

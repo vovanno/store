@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Net.Sockets;
-using AppContext = DAL.Context.AppContext;
+using DAL.Context;
 
 namespace DAL.Configuration
 {
@@ -14,9 +14,9 @@ namespace DAL.Configuration
     {
         public static void RegisterDependencies(IServiceCollection services, string connection)
         {
-            services.AddDbContext<AppContext>(opt => opt.UseMySql(connection));
+            services.AddDbContext<StoreContext>(opt => opt.UseMySql(connection));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            //services.AddScoped<IAppContext, AppContext>();
+            //services.AddScoped<IAppContext, StoreContext>();
             services.AddIdentity<IdentityUser, IdentityRole>(opt => opt.Password = new PasswordOptions()
             {
                 RequireDigit = true,
@@ -25,7 +25,7 @@ namespace DAL.Configuration
                 RequireUppercase = true,
                 RequireNonAlphanumeric = true
             })
-                .AddEntityFrameworkStores<AppContext>();
+                .AddEntityFrameworkStores<StoreContext>();
             TryMigrate(connection);
         }
 
@@ -50,8 +50,8 @@ namespace DAL.Configuration
                 Console.WriteLine("Connection to database failed.\n" + e.Message);
             }
 
-            var builder = new DbContextOptionsBuilder<AppContext>().UseMySql(connection);
-            var context = new AppContext(builder.Options);
+            var builder = new DbContextOptionsBuilder<StoreContext>().UseMySql(connection);
+            var context = new StoreContext(builder.Options);
             context.Database.Migrate();
         }
     }

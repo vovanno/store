@@ -2,11 +2,11 @@
 {
     public class CreateOrderRequest
     {
-        public int[] GameIds { get; set; }
+        public int[] ProductsIds { get; set; }
     }
 
     public class EditOrderRequest
     {
-        public int[] GameIds { get; set; }
+        public int[] ProductsIds { get; set; }
     }
 }
