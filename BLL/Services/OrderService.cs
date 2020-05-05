@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
-using DAL.Entities;
+﻿using BLL.Interfaces;
 using DAL.Interfaces;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,72 +11,68 @@ namespace BLL.Services
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unit;
-        private readonly IMapper _mapper;
 
-        public OrderService(IUnitOfWork unit, IMapper mapper)
+        public OrderService(IUnitOfWork unit)
         {
-            _mapper = mapper;
             _unit = unit;
         }
 
-        public async Task<int> AddOrder(OrderDto order)
+        public async Task<int> AddOrder(int[] productIds)
         {
-            if (order == null)
-                throw new ArgumentNullException(nameof(order));
+            var foundProducts = await CheckProductsAvailability(productIds);
+            var utcNow = DateTime.UtcNow;
 
-            //Create order without games, in order to receive orderId.
-            var orderItems = order.OrdersGames;
-            order.OrdersGames = null;
-            var tempOrder = _mapper.Map<Order>(order);
-            var result = await _unit.OrderRepository.Add(tempOrder);
+            var orderRequest = new Order { OrderDate = utcNow };
+            var order = await _unit.OrderRepository.Add(orderRequest);
+
+            var products = foundProducts.Select(p => new OrdersProduct { OrderId = order.OrderId, ProductId = p.ProductId }).ToList();
+            order.Products = products;
+
             await _unit.Commit();
 
-            //Try add games to the created order, and update order entity.
-            var orderGames = orderItems.Select(item => new OrderGame() { OrderId = result.OrderId, GameId = item.GameId }).ToList();
-            result.OrdersGames = orderGames;
-            await _unit.OrderRepository.Update(result.OrderId, result);
-            try
-            {
-                await _unit.Commit();
-            }
-            catch (Exception)
-            {
-                await _unit.OrderRepository.PermanentDelete(result);
-                await _unit.Commit();
-                return 0;
-            }
-            return result.OrderId;
+            return order.OrderId;
         }
 
-        public async Task EditOrder(int id, OrderDto order)
+        public async Task EditOrder(int orderId, int[] productsIds)
         {
-            if (id < 0)
-                throw new ArgumentException("Id can not be less than 0");
-            if (order == null)
-                throw new ArgumentNullException(nameof(order));
-            var tempOrder = _mapper.Map<Order>(order);
-            await _unit.OrderRepository.Update(id, tempOrder);
+            var products = await CheckProductsAvailability(productsIds);
+
+            await _unit.OrderRepository.Update(orderId, products);
             await _unit.Commit();
         }
 
-        public async Task<IList<OrderDto>> GetAll()
+        public async Task<IList<Order>> GetAll()
         {
             var result = await _unit.OrderRepository.GetAll();
-            return _mapper.Map<IList<OrderDto>>(result);
+            return result.ToList();
         }
 
-        public async Task<IList<OrderDto>> GetOrdersHistory()
+        public async Task<IList<Order>> GetOrdersHistory()
         {
             var result = await _unit.OrderRepository.GetOrdersHistory();
-            return _mapper.Map<IList<OrderDto>>(result);
+            return result.ToList();
         }
 
-        public async Task<OrderDto> GetOrderById(int id)
+        public async Task<Order> GetOrderById(int orderId)
         {
-            if (id < 0)
-                throw new ArgumentException("Id can not be less than 0");
-            var tempOrder = await _unit.OrderRepository.GetById(id);
-            return _mapper.Map<OrderDto>(tempOrder);
+            var tempOrder = await _unit.OrderRepository.GetById(orderId);
+            return tempOrder;
+        }
+
+        private async Task<List<Product>> CheckProductsAvailability(int[] productIds)
+        {
+            var foundProducts = await _unit.ProductRepository.GetProductsByIds(productIds);
+
+            if (foundProducts.Count != productIds.Length)
+                throw new ArgumentException(nameof(productIds));
+
+            foreach (var product in foundProducts)
+            {
+                if (!product.Availability)
+                    throw new ArgumentException(nameof(productIds));
+            }
+
+            return foundProducts;
         }
     }
 }

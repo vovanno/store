@@ -1,12 +1,11 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using OnlineStoreApi.AuthApi;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,8 +13,6 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.ResponseCaching.Internal;
-using WebApi.VIewDto;
 
 namespace WebApi.Controllers
 {
@@ -26,21 +23,19 @@ namespace WebApi.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IAuthenticateService _authService;
-        private readonly IMapper _mapper;
 
-        public AuthenticationController(IAuthenticateService userService, IConfiguration configuration, IMapper mapper)
+        public AuthenticationController(IAuthenticateService userService, IConfiguration configuration)
         {
             _configuration = configuration;
             _authService = userService;
-            _mapper = mapper;
         }
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register(UserViewDto user)
+        public async Task<IActionResult> Register(RegisterUserRequest request)
         {
-            var temp = _mapper.Map<CustomUser>(user);
-            var result = await _authService.CreateUser(temp, user.Password);
+            var userProfile = request.ToUserProfile();
+            var result = await _authService.CreateUser(userProfile, request.Password);
             return result.Succeeded ? StatusCode((int)HttpStatusCode.Created) : GetErrorResult(result);
         }
 
@@ -58,16 +53,17 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login(UserViewDto user)
+        public async Task<IActionResult> Login(LoginUserRequest request)
         {
-            var temp = _mapper.Map<CustomUser>(user);
-            var userClaims = await _authService.LoginUser(temp, user.Password);
+            var userProfile = request.ToUserProfile();
+
+            var userClaims = await _authService.LoginUser(userProfile, request.Password);
             if (userClaims == null) return StatusCode((int)HttpStatusCode.Unauthorized);
             var token = GenerateJwt(userClaims);
             var response = new
             {
                 access_token = token,
-                userEmail = user.Email
+                userEmail = request.Email
             };
             var result = JsonConvert.SerializeObject(response);
             return Ok(result);

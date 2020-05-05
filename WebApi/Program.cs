@@ -38,9 +38,9 @@ namespace WebApi
                 .UseSerilog()
                 .UseKestrel()
                 .UseStartup<Startup>().ConfigureAppConfiguration((context, config) =>
-                    {
-                        config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json");
-                    });
-
+                {
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                    config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+                });
     }
 }

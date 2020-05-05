@@ -1,12 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using Domain.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using DAL.Entities;
 
 namespace DAL.Interfaces
 {
-    public interface IOrderRepository : IBaseRepository<Order>
+    public interface IOrderRepository
     {
-        Task<IEnumerable<Order>> GetOrdersHistory();
-        Task PermanentDelete(Order order);
+        Task<IList<Order>> GetOrdersHistory();
+        Task<Order> GetById(int orderId);
+        Task<IList<Order>> GetAll();
+        Task<Order> Add(Order order);
+        Task Update(int orderId, List<Product> additionalProducts);
+        Task Delete(int orderId);
     }
 }

@@ -5,11 +5,9 @@ namespace DAL.Interfaces
     public interface IUnitOfWork
     {
         ICommentRepository CommentRepository { get; }
-        IGameRepository GameRepository { get; }
-        IGenreRepository GenreRepository { get; }
-        IPlatformRepository PlatformRepository { get; }
-        IPublisherRepository PublisherRepository { get; }
-        ISubGenreRepository SubGenreRepository { get; }
+        IProductRepository ProductRepository { get; }
+        ICategoryRepository CategoryRepository { get; }
+        IManufacturerRepository ManufacturerRepository { get; }
         IOrderRepository OrderRepository { get; }
         Task Commit();
     }

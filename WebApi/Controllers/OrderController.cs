@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+﻿using BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using WebApi.VIewDto;
+using Microsoft.AspNetCore.Mvc;
+using OnlineStoreApi.OrdersApi;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
@@ -14,62 +12,58 @@ namespace WebApi.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orders;
-        private readonly IMapper _mapper;
 
-        public OrderController(IOrderService order, IMapper mapper)
+        public OrderController(IOrderService order)
         {
-            _mapper = mapper;
             _orders = order;
         }
 
         [HttpPost]
-        [Authorize(Roles = "user, manager, admin, moderator")]
-        public async Task<IActionResult> AddOrder([FromBody] OrderViewDto order)
+        //[Authorize(Roles = "user, manager, admin, moderator")]
+        public async Task<ActionResult<int>> AddOrder([FromBody] CreateOrderRequest request)
         {
-            var tempOrder = _mapper.Map<OrderDto>(order);
-            var result = await _orders.AddOrder(tempOrder);
-            if (result == 0)
+            var orderedProductsIds = request.ProductsIds;
+            var orderId = await _orders.AddOrder(orderedProductsIds);
+
+            if (orderId == 0)
                 return BadRequest("You can not make an order for a non-existent game");
-            return Ok(result);
+
+            return Ok(orderId);
         }
 
         [HttpPut]
-        [Route("{id:int:min(1)}")]
-        [Authorize(Roles = "manager")]
-        public async Task<IActionResult> EditOrder(int id, [FromBody] OrderViewDto order)
+        [Route("{orderId:int:min(1)}")]
+        //[Authorize(Roles = "manager")]
+        public async Task<IActionResult> EditOrder(int orderId, [FromBody] EditOrderRequest request)
         {
-            var tempOrder = _mapper.Map<OrderDto>(order);
-            await _orders.EditOrder(id, tempOrder);
-            return Ok();
+            await _orders.EditOrder(orderId, request.ProductsIds);
+            return NoContent();
         }
 
         [HttpGet]
-        [Authorize(Roles = "manager")]
-        public async Task<IActionResult> GetAllOrders()
+        //[Authorize(Roles = "manager")]
+        public async Task<ActionResult<List<OrderResponse>>> GetAllOrders()
         {
-            var result = await _orders.GetAll();
-            var orders = _mapper.Map<IList<OrderViewDto>>(result);
-            return Ok(orders);
+            var orders = await _orders.GetAll();
+            return Ok(orders.ToOrderResponse());
         }
 
         [HttpGet]
         [Route("history")]
         [Authorize(Roles = "manager")]
-        public async Task<IActionResult> GetOrdersHistory()
+        public async Task<ActionResult<List<OrderResponse>>> GetOrdersHistory()
         {
-            var result = await _orders.GetOrdersHistory();
-            var orders = _mapper.Map<IList<OrderViewDto>>(result);
-            return Ok(orders);
+            var ordersHistory = await _orders.GetOrdersHistory();
+            return Ok(ordersHistory.ToOrderResponse());
         }
 
         [HttpGet]
         [Route("{id:int:min(1)}")]
-        [Authorize(Roles = "user, manager")]
-        public async Task<IActionResult> GetOrderById(int id)
+        //[Authorize(Roles = "user, manager")]
+        public async Task<ActionResult<OrderResponse>> GetOrderById(int id)
         {
-            var result = await _orders.GetOrderById(id);
-            var order = _mapper.Map<OrderViewDto>(result);
-            return Ok(order);
+            var order = await _orders.GetOrderById(id);
+            return Ok(order.ToOrderResponse());
         }
     }
 }
