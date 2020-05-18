@@ -29,6 +29,13 @@ namespace WebApi.Controllers
             return Ok(publishersList.Select(p => p.ToManufacturerResponse()));
         }
 
+        [HttpGet("category/{categoryId:int:min(1)}")]
+        public async Task<ActionResult<List<ManufacturerResponse>>> GetManufacturersByCategoryId(int categoryId)
+        {
+            var manufacturers = await _manufacturerService.GetManufacturersByCategory(categoryId);
+            return Ok(manufacturers.Select(p => p.ToManufacturerResponse()));
+        }
+
         [HttpGet]
         [Route("{manufacturerId:int:min(1)}")]
         public async Task<ActionResult<ManufacturerResponse>> GetManufacturer(int manufacturerId)

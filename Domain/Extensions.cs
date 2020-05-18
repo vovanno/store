@@ -47,7 +47,7 @@ namespace Domain
             }
 
             product.Rating = product.Comments
-                .Where(x => x.ParentCommentId == 0 )
+                //.Where(x => x.ParentCommentId == 0 )
                 .Select(x => x.ProductRating).Average();
         }
 

@@ -42,7 +42,7 @@ namespace WebApi.Controllers
             var commentModel = request.ToCommentModel();
             commentModel.DateOfAdding = DateTime.UtcNow;
 
-            var createdCommentId = await _commentService.Create(commentModel);
+            var createdCommentId = await _commentService.Create(commentModel, request.ParentId);
             return Ok(createdCommentId);
         }
 

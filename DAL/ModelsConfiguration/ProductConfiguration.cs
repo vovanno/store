@@ -17,6 +17,7 @@ namespace DAL.ModelsConfiguration
             builder.Property(p => p.ManufacturerId).IsRequired();
             builder.Property(p => p.Availability).IsRequired().HasDefaultValue(false);
             builder.Ignore(p => p.Rating);
+            builder.Ignore(p => p.AmountOfComments);
         }
     }
 }

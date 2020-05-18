@@ -12,6 +12,7 @@ namespace Domain.Entities
         public bool Availability { get; set; }
         public int ManufacturerId { get; set; }
         public int CategoryId { get; set; }
+        public int AmountOfComments { get; set; }
         public Category Category { get; set; }
         public Manufacturer Manufacturer { get; set; }
         public IList<Comment> Comments { get; set; }

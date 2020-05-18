@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OnlineStoreApi.CommentApi
 {
@@ -10,6 +11,6 @@ namespace OnlineStoreApi.CommentApi
         public int AmountOfLikes { get; set; }
         public DateTime DateOfAdding { get; set; }
         public int ProductId { get; set; }
-        public int? ParentId { get; set; }
+        public List<CommentResponse> Children { get; set; }
     }
 }

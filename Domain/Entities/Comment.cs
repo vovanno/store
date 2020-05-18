@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Domain.Entities
 {
@@ -12,6 +13,7 @@ namespace Domain.Entities
         public bool IsDeleted { get; set; } = false;
         public int ProductId { get; set; }
         public Product Product { get; set; }
-        public int? ParentCommentId { get; set; }
+        public string UserName { get; set; }
+        public IList<Comment> Children { get; set; }
     }
 }

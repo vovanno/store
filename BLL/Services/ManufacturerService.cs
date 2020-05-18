@@ -45,5 +45,12 @@ namespace BLL.Services
             var result = await _unit.ManufacturerRepository.GetAll();
             return result.ToList();
         }
+
+        public async Task<List<Manufacturer>> GetManufacturersByCategory(int categoryId)
+        {
+            await _unit.CategoryRepository.GetById(categoryId);
+
+            return await _unit.ManufacturerRepository.GetManufacturersByCategory(categoryId);
+        }
     }
 }

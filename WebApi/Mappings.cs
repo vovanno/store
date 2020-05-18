@@ -4,6 +4,7 @@ using OnlineStoreApi.AuthApi;
 using OnlineStoreApi.CommentApi;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using OnlineStoreApi.CategoryApi;
 using OnlineStoreApi.ManufactureApi;
 using OnlineStoreApi.OrdersApi;
@@ -13,6 +14,8 @@ namespace WebApi
 {
     public static class Mappings
     {
+        private const string DownloadUrl = "https://computer-store-images.s3.us-east-2.amazonaws.com/";
+
         public static CommentResponse ToCommentResponse(this Comment comment)
         {
             return new CommentResponse
@@ -23,7 +26,7 @@ namespace WebApi
                 DateOfAdding = comment.DateOfAdding,
                 AmountOfLikes = comment.AmountOfLikes,
                 Body = comment.Body,
-                ParentId = comment.ParentCommentId
+                Children = comment.Children.ToCommentResponse()
             };
         }
 
@@ -36,8 +39,8 @@ namespace WebApi
                 ProductRating = p.ProductRating,
                 DateOfAdding = p.DateOfAdding,
                 CommentId = p.CommentId,
-                ParentId = p.CommentId,
-                ProductId = p.ProductId
+                ProductId = p.ProductId,
+                Children = p.Children.ToCommentResponse(),
             }).ToList();
         }
 
@@ -48,7 +51,6 @@ namespace WebApi
                 Body = request.Body,
                 ProductRating = request.ProductRating,
                 ProductId = request.ProductId,
-                ParentCommentId = request.ParentId
             };
         }
 
@@ -90,7 +92,8 @@ namespace WebApi
                 Rating = product.Rating,
                 Category = product.Category.ToCategoryResponse(),
                 Manufacturer = product.Manufacturer.ToManufacturerResponse(),
-                Comments = product.Comments.ToCommentResponse()
+                Comments = product.Comments.ToCommentResponse(),
+                Images = product.Images.Select(x => new ImageResponse{ImageUrl = $"{DownloadUrl}{x.ImageKey}"}).ToList()
             };
         }
 

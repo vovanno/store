@@ -19,4 +19,15 @@
         public int ManufacturerId { get; set; }
         public int CategoryId { get; set; }
     }
+
+    public class UploadImageRequest
+    {
+        public CreateImageRequest[] CreateImagesRequest { get; set; }
+    }
+
+    public class CreateImageRequest
+    {
+        public string ImageContent { get; set; }
+        public bool IsMain { get; set; }
+    }
 }

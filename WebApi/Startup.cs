@@ -12,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Threading.Tasks;
+using Amazon.S3;
+using WebApi.Configuration;
 using WebApi.Configuration.Validation;
 using WebApi.Middleware;
 
@@ -67,6 +69,7 @@ namespace WebApi
             services.AddSingleton<IAmazonDynamoDB>(provider => new AmazonDynamoDBClient(RegionEndpoint.EUWest2));
             services.AddSingleton<IDynamoDBContext>(provider =>
                 new DynamoDBContext(provider.GetRequiredService<IAmazonDynamoDB>()));
+            services.AddSingleton<IAmazonS3>(provider => new AmazonS3Client());
 
             services.AddScoped<IAuthenticateService, AuthenticateService>();
             services.AddScoped<IOrderService, OrderService>();
@@ -76,8 +79,10 @@ namespace WebApi
             services.AddScoped<IManufacturerService, ManufacturerService>();
             BLL.Configuration.Configuration.RegisterDependencies(services, Configuration.GetConnectionString("DefaultConnection"));
             services.AddSwaggerGen(options =>
-                options.SwaggerDoc("v1", new Info { Title = "Online GameStore", Version = "v1" })
-            );
+            {
+                options.SwaggerDoc("v1", new Info {Title = "Online GameStore", Version = "v1"});
+                options.OperationFilter<FormFileSwaggerFilter>();
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -85,7 +90,7 @@ namespace WebApi
             app.UseCors("CustomPolicy");
             app.UseSwagger();
             app.UseSwaggerUI(options =>
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Online GameStore")
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Online GameStore")
             );
             if (env.IsDevelopment())
             {

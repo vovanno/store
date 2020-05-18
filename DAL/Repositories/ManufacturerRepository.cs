@@ -6,6 +6,7 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DAL.Repositories
@@ -51,6 +52,12 @@ namespace DAL.Repositories
         {
             await _context.Database.ExecuteSqlCommandAsync("DELETE FROM Manufacturers WHERE ManufacturerId=@manufacturerId",
                 new MySqlParameter("@manufacturerId", manufacturerId));
+        }
+
+        public async Task<List<Manufacturer>> GetManufacturersByCategory(int categoryId)
+        {
+            return await _context.Manufacturers.AsNoTracking()
+                .Where(p => p.Products.Select(x => x.CategoryId).Contains(categoryId)).ToListAsync();
         }
     }
 }
