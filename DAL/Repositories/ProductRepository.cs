@@ -44,11 +44,35 @@ namespace DAL.Repositories
 
         public async Task<Product> GetById(int productId)
         {
+
+            //var product = await from row in _context.Products
+            //    select new Product()
+            //    {
+            //        ProductId = row.ProductId,
+            //        AmountOfComments = row.Comments.Count,
+            //        Availability = row.Availability,
+            //        Category = row.Category,
+            //        Description = row.Description,
+            //        Images = row.Images,
+            //        Manufacturer = row.Manufacturer,
+            //        ManufacturerId = row.ManufacturerId,
+            //        Name = row.Name,
+            //        Price = row.Price
+            //    };
+            var product = await _context.Products
+                .GetAllProductProperties()
+                .FirstOrDefaultAsync(p => p.ProductId == productId);
+
+            return product ?? throw new EntryNotFoundException($"Product with ProductId={productId} was not found");
+        }
+
+        public async Task<Product> FindById(int productId)
+        {
             var game = await _context.Products
                 .GetAllProductProperties()
                 .FirstOrDefaultAsync(p => p.ProductId == productId);
 
-            return game ?? throw new EntryNotFoundException($"Product with ProductId={productId} was not found");
+            return game;
         }
 
         public async Task<List<Product>> GetAll()
@@ -66,9 +90,31 @@ namespace DAL.Repositories
             return gameEntity.Entity;
         }
 
+        public async Task UploadImages(int productId, List<string> imagesNames)
+        {
+            var images = imagesNames.Select(p => new Image()
+            {
+                ImageKey = p,
+                ProductId = productId
+            });
+            await _context.Images.AddRangeAsync(images);
+        }
+
+        public async Task UploadImage(int productId, string imageName, bool isMain)
+        {
+            var image = new Image()
+            {
+                ImageKey = imageName,
+                ProductId = productId,
+                IsMain = isMain
+            };
+            await _context.Images.AddRangeAsync(image);
+        }
+
         public async Task Update(int productId, Product updatedGame)
         {
             var modifiedObj = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
+            updatedGame.ProductId = productId;
 
             _context.Entry(modifiedObj).CurrentValues.SetValues(updatedGame);
         }

@@ -1,5 +1,6 @@
 ﻿using CrossCuttingFunctionality.FilterModels;
 using Domain.Entities;
+using OnlineStoreApi.ProductApi;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,5 +16,6 @@ namespace BLL.Interfaces
         Task Delete(int productId);
         Task<Product> GetById(int productId);
         Task<List<Product>> GetAll();
+        Task UploadImages(int productId, CreateImageRequest[] createImagesRequest);
     }
 }

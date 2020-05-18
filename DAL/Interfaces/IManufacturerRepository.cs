@@ -11,5 +11,6 @@ namespace DAL.Interfaces
         Task<Manufacturer> Add(Manufacturer entity);
         Task Update(int manufacturerId, Manufacturer updatedEntity);
         Task Delete(int manufacturerId);
+        Task<List<Manufacturer>> GetManufacturersByCategory(int categoryId);
     }
 }

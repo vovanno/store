@@ -22,11 +22,21 @@ namespace BLL.Services
             return await _unit.CommentRepository.GetCommentsByProductId(productId);
         }
 
-        public async Task<int> Create(Comment comment)
+        public async Task<int> Create(Comment comment, int? parentId)
         {
-            var createdComment = await _unit.CommentRepository.Add(comment);
+            Comment createdComment = null;
+
+            if (parentId == null || parentId == 0)
+                createdComment = await _unit.CommentRepository.Add(comment);
+            else
+            {
+                var parent = await _unit.CommentRepository.GetById(parentId.Value);
+                if(parent.Children == null)
+                    parent.Children = new List<Comment>();
+                parent.Children.Add(comment);
+            }
             await _unit.Commit();
-            return createdComment.CommentId;
+            return createdComment?.CommentId ?? 0;
         }
 
         public async Task Edit(int commentId, Comment comment)

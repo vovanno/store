@@ -1,13 +1,13 @@
-﻿using System;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
 using CrossCuttingFunctionality.FilterModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStoreApi.CommentApi;
+using OnlineStoreApi.ProductApi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OnlineStoreApi.ProductApi;
 
 namespace WebApi.Controllers
 {
@@ -51,6 +51,14 @@ namespace WebApi.Controllers
             return Ok(createdGameId);
         }
 
+        [HttpPost("{productId:int:min(1)}/image")]
+        //[Authorize(Roles = "manager")]
+        public async Task<ActionResult<int>> UploadImages(int productId, [FromBody] UploadImageRequest request)
+        {
+            await _productService.UploadImages(productId, request.CreateImagesRequest);
+            return Ok();
+        }
+
         [HttpPut("{productId:int:min(1)}")]
         //[Authorize(Roles = "manager, publisher")]
         public async Task<ActionResult> EditGame(int productId, [FromBody] EditProductRequest request)
@@ -78,7 +86,7 @@ namespace WebApi.Controllers
             commentModel.ProductId = productId;
             commentModel.DateOfAdding = DateTime.UtcNow;
 
-            await _commentService.Create(commentModel);
+            await _commentService.Create(commentModel, request.ParentId);
             return Ok();
         }
 

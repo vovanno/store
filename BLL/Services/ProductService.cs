@@ -1,20 +1,28 @@
-﻿using BLL.Interfaces;
+﻿using Amazon.S3;
+using Amazon.S3.Model;
+using BLL.Interfaces;
 using CrossCuttingFunctionality.FilterModels;
 using DAL.Interfaces;
 using Domain;
 using Domain.Entities;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using OnlineStoreApi.ProductApi;
 
 namespace BLL.Services
 {
     public class ProductService : IProductService
     {
         private readonly IUnitOfWork _unit;
+        private readonly IAmazonS3 _s3Client;
 
-        public ProductService(IUnitOfWork unit)
+        public ProductService(IUnitOfWork unit, IAmazonS3 s3Client)
         {
             _unit = unit;
+            _s3Client = s3Client;
         }
 
         public async Task<List<Product>> GetProductsByCategoryId(int categoryId)
@@ -74,6 +82,40 @@ namespace BLL.Services
             products.CountRatingForProducts();
 
             return products;
+        }
+
+        public async Task UploadImages(int productId, CreateImageRequest[] createImagesRequest)
+        {
+            var bucketName = "computer-store-images";
+
+            await _unit.ProductRepository.GetById(productId);
+
+            foreach (var imageRequest in createImagesRequest.OrderBy(p => p.IsMain))
+            {
+                var imageName = Guid.NewGuid().ToString("N");
+                var base64Content = imageRequest.ImageContent.Split(',')[1];
+                var buffer = Convert.FromBase64String(base64Content);
+                var stream = new MemoryStream(buffer);
+
+                try
+                {
+                    await _s3Client.PutObjectAsync(new PutObjectRequest
+                    {
+                        Key = imageName,
+                        BucketName = bucketName,
+                        InputStream = stream
+                    });
+                }
+                catch (Exception)
+                {
+                    if(imageRequest.IsMain)
+                        throw new Exception("Error occured during uploading of main image, skipping other uploads.");
+                    continue;
+                }
+
+                await _unit.ProductRepository.UploadImage(productId, imageName, imageRequest.IsMain);
+                await _unit.Commit();
+            }
         }
     }
 }

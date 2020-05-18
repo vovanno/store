@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DAL.Migrations
 {
-    public partial class add_restriction_for_foreign_keys : Migration
+    public partial class drop_all : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -79,6 +79,7 @@ namespace DAL.Migrations
                 {
                     OrderId = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Status = table.Column<string>(nullable: true),
                     OrderDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
@@ -200,12 +201,10 @@ namespace DAL.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(maxLength: 50, nullable: false),
                     Description = table.Column<string>(maxLength: 500, nullable: true),
-                    Rating = table.Column<int>(nullable: false),
                     Price = table.Column<double>(nullable: false),
                     Availability = table.Column<bool>(nullable: false, defaultValue: false),
                     ManufacturerId = table.Column<int>(nullable: false),
-                    CategoryId = table.Column<int>(nullable: false),
-                    OrderId = table.Column<int>(nullable: true)
+                    CategoryId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -222,12 +221,6 @@ namespace DAL.Migrations
                         principalTable: "Manufacturers",
                         principalColumn: "ManufacturerId",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Products_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
-                        principalColumn: "OrderId",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -236,17 +229,24 @@ namespace DAL.Migrations
                 {
                     CommentId = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(maxLength: 30, nullable: false),
                     Body = table.Column<string>(maxLength: 300, nullable: false),
+                    ProductRating = table.Column<int>(nullable: false),
                     AmountOfLikes = table.Column<int>(nullable: false),
                     DateOfAdding = table.Column<DateTime>(nullable: false),
                     IsDeleted = table.Column<bool>(nullable: false),
                     ProductId = table.Column<int>(nullable: false),
-                    ParentCommentId = table.Column<int>(nullable: true)
+                    UserName = table.Column<string>(nullable: true),
+                    CommentId1 = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Comments", x => x.CommentId);
+                    table.ForeignKey(
+                        name: "FK_Comments_Comments_CommentId1",
+                        column: x => x.CommentId1,
+                        principalTable: "Comments",
+                        principalColumn: "CommentId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Comments_Products_ProductId",
                         column: x => x.ProductId,
@@ -262,6 +262,7 @@ namespace DAL.Migrations
                     ImageId = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ImageKey = table.Column<string>(nullable: false),
+                    IsMain = table.Column<bool>(nullable: false, defaultValue: false),
                     ProductId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -273,6 +274,61 @@ namespace DAL.Migrations
                         principalTable: "Products",
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrdersProducts",
+                columns: table => new
+                {
+                    ProductId = table.Column<int>(nullable: false),
+                    OrderId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrdersProducts", x => new { x.OrderId, x.ProductId });
+                    table.ForeignKey(
+                        name: "FK_OrdersProducts_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrdersProducts_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "CategoryId", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Ноутбуки" },
+                    { 22, "Игровые консоли" },
+                    { 21, "Системы охлаждения" },
+                    { 20, "Источники бесперебойного питания" },
+                    { 19, "Флеш память USB" },
+                    { 18, "Проекторы" },
+                    { 17, "Корпуса" },
+                    { 16, "Блоки питания" },
+                    { 15, "Клавиатуры" },
+                    { 14, "Акустические системы" },
+                    { 13, "Маршрутизаторы" },
+                    { 12, "Мыши" },
+                    { 11, "Материнские платы" },
+                    { 10, "Память" },
+                    { 9, "Принтеры" },
+                    { 8, "SSD" },
+                    { 7, "Процессоры" },
+                    { 6, "Компьютеры" },
+                    { 5, "Мониторы" },
+                    { 4, "Жесткие диски" },
+                    { 3, "Видеокарты" },
+                    { 2, "Паншеты" },
+                    { 23, "Сумки, рюкзаки и чехлы" },
+                    { 24, "Стабилизаторы напряжения" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -319,6 +375,11 @@ namespace DAL.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comments_CommentId1",
+                table: "Comments",
+                column: "CommentId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Comments_ProductId",
                 table: "Comments",
                 column: "ProductId");
@@ -335,6 +396,11 @@ namespace DAL.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrdersProducts_ProductId",
+                table: "OrdersProducts",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
@@ -343,18 +409,10 @@ namespace DAL.Migrations
                 name: "IX_Products_ManufacturerId",
                 table: "Products",
                 column: "ManufacturerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_OrderId",
-                table: "Products",
-                column: "OrderId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "AspNetRoles");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -377,7 +435,16 @@ namespace DAL.Migrations
                 name: "Images");
 
             migrationBuilder.DropTable(
+                name: "OrdersProducts");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Products");
@@ -387,9 +454,6 @@ namespace DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Manufacturers");
-
-            migrationBuilder.DropTable(
-                name: "Orders");
         }
     }
 }

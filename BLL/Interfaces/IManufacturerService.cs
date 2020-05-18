@@ -11,5 +11,6 @@ namespace BLL.Interfaces
         Task Delete(int id);
         Task<Manufacturer> GetById(int id);
         Task<List<Manufacturer>> GetAll();
+        Task<List<Manufacturer>> GetManufacturersByCategory(int categoryId);
     }
 }

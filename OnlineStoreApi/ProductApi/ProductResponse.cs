@@ -16,6 +16,11 @@ namespace OnlineStoreApi.ProductApi
         public CategoryResponse Category { get; set; }
         public ManufacturerResponse Manufacturer { get; set; }
         public IList<CommentResponse> Comments { get; set; }
-        //public IList<Image> Images { get; set; }
+        public IList<ImageResponse> Images { get; set; }
+    }
+
+    public class ImageResponse
+    {
+        public string ImageUrl { get; set; }
     }
 }

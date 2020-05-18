@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20200306194130_add_restriction_for_foreign_keys")]
-    partial class add_restriction_for_foreign_keys
+    [Migration("20200516153500_drop_all")]
+    partial class drop_all
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -36,6 +36,128 @@ namespace DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            Name = "Ноутбуки"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            Name = "Паншеты"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            Name = "Видеокарты"
+                        },
+                        new
+                        {
+                            CategoryId = 4,
+                            Name = "Жесткие диски"
+                        },
+                        new
+                        {
+                            CategoryId = 5,
+                            Name = "Мониторы"
+                        },
+                        new
+                        {
+                            CategoryId = 6,
+                            Name = "Компьютеры"
+                        },
+                        new
+                        {
+                            CategoryId = 7,
+                            Name = "Процессоры"
+                        },
+                        new
+                        {
+                            CategoryId = 8,
+                            Name = "SSD"
+                        },
+                        new
+                        {
+                            CategoryId = 9,
+                            Name = "Принтеры"
+                        },
+                        new
+                        {
+                            CategoryId = 10,
+                            Name = "Память"
+                        },
+                        new
+                        {
+                            CategoryId = 11,
+                            Name = "Материнские платы"
+                        },
+                        new
+                        {
+                            CategoryId = 12,
+                            Name = "Мыши"
+                        },
+                        new
+                        {
+                            CategoryId = 13,
+                            Name = "Маршрутизаторы"
+                        },
+                        new
+                        {
+                            CategoryId = 14,
+                            Name = "Акустические системы"
+                        },
+                        new
+                        {
+                            CategoryId = 15,
+                            Name = "Клавиатуры"
+                        },
+                        new
+                        {
+                            CategoryId = 16,
+                            Name = "Блоки питания"
+                        },
+                        new
+                        {
+                            CategoryId = 17,
+                            Name = "Корпуса"
+                        },
+                        new
+                        {
+                            CategoryId = 18,
+                            Name = "Проекторы"
+                        },
+                        new
+                        {
+                            CategoryId = 19,
+                            Name = "Флеш память USB"
+                        },
+                        new
+                        {
+                            CategoryId = 20,
+                            Name = "Источники бесперебойного питания"
+                        },
+                        new
+                        {
+                            CategoryId = 21,
+                            Name = "Системы охлаждения"
+                        },
+                        new
+                        {
+                            CategoryId = 22,
+                            Name = "Игровые консоли"
+                        },
+                        new
+                        {
+                            CategoryId = 23,
+                            Name = "Сумки, рюкзаки и чехлы"
+                        },
+                        new
+                        {
+                            CategoryId = 24,
+                            Name = "Стабилизаторы напряжения"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Comment", b =>
@@ -50,19 +172,21 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasMaxLength(300);
 
+                    b.Property<int?>("CommentId1");
+
                     b.Property<DateTime>("DateOfAdding");
 
                     b.Property<bool>("IsDeleted");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(30);
-
-                    b.Property<int?>("ParentCommentId");
-
                     b.Property<int>("ProductId");
 
+                    b.Property<int>("ProductRating");
+
+                    b.Property<string>("UserName");
+
                     b.HasKey("CommentId");
+
+                    b.HasIndex("CommentId1");
 
                     b.HasIndex("ProductId");
 
@@ -77,6 +201,10 @@ namespace DAL.Migrations
 
                     b.Property<string>("ImageKey")
                         .IsRequired();
+
+                    b.Property<bool>("IsMain")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(false);
 
                     b.Property<int>("ProductId");
 
@@ -113,9 +241,24 @@ namespace DAL.Migrations
 
                     b.Property<DateTime>("OrderDate");
 
+                    b.Property<string>("Status");
+
                     b.HasKey("OrderId");
 
                     b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Domain.Entities.OrdersProduct", b =>
+                {
+                    b.Property<int>("OrderId");
+
+                    b.Property<int>("ProductId");
+
+                    b.HasKey("OrderId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrdersProducts");
                 });
 
             modelBuilder.Entity("Domain.Entities.Product", b =>
@@ -139,19 +282,13 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasMaxLength(50);
 
-                    b.Property<int?>("OrderId");
-
                     b.Property<double>("Price");
-
-                    b.Property<int>("Rating");
 
                     b.HasKey("ProductId");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("ManufacturerId");
-
-                    b.HasIndex("OrderId");
 
                     b.ToTable("Products");
                 });
@@ -315,6 +452,10 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("Domain.Entities.Comment", b =>
                 {
+                    b.HasOne("Domain.Entities.Comment")
+                        .WithMany("Children")
+                        .HasForeignKey("CommentId1");
+
                     b.HasOne("Domain.Entities.Product", "Product")
                         .WithMany("Comments")
                         .HasForeignKey("ProductId")
@@ -325,6 +466,19 @@ namespace DAL.Migrations
                 {
                     b.HasOne("Domain.Entities.Product", "Product")
                         .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Domain.Entities.OrdersProduct", b =>
+                {
+                    b.HasOne("Domain.Entities.Order", "Order")
+                        .WithMany("Products")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.Entities.Product", "Product")
+                        .WithMany("Orders")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -340,10 +494,6 @@ namespace DAL.Migrations
                         .WithMany("Products")
                         .HasForeignKey("ManufacturerId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Domain.Entities.Order")
-                        .WithMany("Products")
-                        .HasForeignKey("OrderId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

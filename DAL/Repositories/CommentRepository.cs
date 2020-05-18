@@ -47,7 +47,8 @@ namespace DAL.Repositories
 
         public async Task<Comment> GetById(int commentId)
         {
-            var comment = await _context.Comments.FirstOrDefaultAsync(p => p.CommentId == commentId);
+            var comment = await _context.Comments.Include(p => p.Children)
+                .FirstOrDefaultAsync(p => p.CommentId == commentId);
             
             if(comment == null)
                 throw new EntryNotFoundException($"Comment with CommentId={commentId} was not found");
@@ -57,7 +58,7 @@ namespace DAL.Repositories
 
         public async Task<IList<Comment>> GetAll()
         {
-            return await _context.Comments.AsNoTracking().ToListAsync();
+            return await _context.Comments.AsNoTracking().Include(p => p.Children).Distinct().ToListAsync();
         }
 
         public async Task<Comment> Add(Comment comment)

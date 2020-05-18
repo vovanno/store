@@ -12,7 +12,6 @@ namespace DAL.ModelsConfiguration
             builder.Property(p => p.CommentId).UseMySqlIdentityColumn();
             builder.Property(p => p.Body).HasMaxLength(300).IsRequired();
             builder.Property(p => p.ProductId).IsRequired();
-            builder.Property(p => p.ParentCommentId).IsRequired(false);
             builder.HasQueryFilter(p => !p.IsDeleted);
         }
     }
