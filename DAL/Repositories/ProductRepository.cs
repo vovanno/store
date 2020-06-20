@@ -1,5 +1,4 @@
-﻿using CrossCuttingFunctionality.FilterModels;
-using DAL.Exceptions;
+﻿using DAL.Exceptions;
 using DAL.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DAL.Context;
+using Domain.Entities.FilterModels;
 
 namespace DAL.Repositories
 {
@@ -30,6 +30,7 @@ namespace DAL.Repositories
         public async Task<List<Product>> GetProductsByIds(int[] productsIds)
         {
             return await _context.Products
+                .GetAllProductProperties()
                 .Where(p => productsIds.Contains(p.ProductId)).ToListAsync();
         }
 
@@ -42,25 +43,19 @@ namespace DAL.Repositories
             return games;
         }
 
+        public async Task<Product> CheckById(int productId)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
+
+            return product ?? throw new EntryNotFoundException($"Product with ProductId={productId} was not found");
+        }
+
         public async Task<Product> GetById(int productId)
         {
-
-            //var product = await from row in _context.Products
-            //    select new Product()
-            //    {
-            //        ProductId = row.ProductId,
-            //        AmountOfComments = row.Comments.Count,
-            //        Availability = row.Availability,
-            //        Category = row.Category,
-            //        Description = row.Description,
-            //        Images = row.Images,
-            //        Manufacturer = row.Manufacturer,
-            //        ManufacturerId = row.ManufacturerId,
-            //        Name = row.Name,
-            //        Price = row.Price
-            //    };
             var product = await _context.Products
-                .GetAllProductProperties()
+                .Include(p => p.Manufacturer)
+                .Include(p => p.Images)
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.ProductId == productId);
 
             return product ?? throw new EntryNotFoundException($"Product with ProductId={productId} was not found");
@@ -138,13 +133,23 @@ namespace DAL.Repositories
             await _context.Comments.AddAsync(comment);
         }
 
-        public async Task<List<Product>> GetGamesWithFilters(FilterModel filter)
+        public async Task<List<Product>> GetProductsWithFilters(FilterModel filter)
         {
             IOrderedEnumerable<Product> filteredResult = null; 
 
-            var result = await _context.Products.Where(p => 
-                            filter.Publishers.Contains(p.Manufacturer.Name) &&
-                            p.Price > filter.PriceFilter.From && p.Price <= filter.PriceFilter.To).ToListAsync();
+            var query = _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Manufacturer)
+                .Include(p => p.Images)
+                .Where(p => p.CategoryId == filter.CategoryId &&
+                            p.Price > filter.PriceFilter.From && p.Price <= filter.PriceFilter.To);
+
+            if (filter.ManufacturersIds.Length > 0)
+                query = query.Where(p => filter.ManufacturersIds.Contains(p.Manufacturer.ManufacturerId));
+
+            if (filter.IsMostPopular)
+                query.Include(p => p.Comments);
+            var result = await query.ToListAsync();
 
             if (filter.IsMostCommented)
             {
@@ -152,7 +157,7 @@ namespace DAL.Repositories
             }
             else if (filter.IsMostPopular)
             {
-                //filteredResult = result.OrderBy(p => p.AmountOfViews);
+                filteredResult = result.OrderBy(p => p.Comments?.Count);
             }
             else if (filter.ByPriceAscending)
             {
@@ -162,15 +167,8 @@ namespace DAL.Repositories
             {
                 filteredResult = result.OrderByDescending(p => p.Price);
             }
-            else if (filter.ByDateAscending)
-            {
-                //filteredResult = result.OrderBy(p => p.DateOfAdding);
-            }
-            else if (filter.ByDateDescending)
-            {
-                //filteredResult = result.OrderByDescending(p => p.DateOfAdding);
-            }
-            return filteredResult?.Skip((filter.Page - 1) * filter.Size).Take(filter.Size).ToList();
+
+            return filteredResult?.Skip((filter.Page -1) * filter.Size).Take(filter.Size).ToList();
         }
     }
 }

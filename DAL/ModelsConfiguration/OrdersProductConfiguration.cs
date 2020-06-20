@@ -9,9 +9,10 @@ namespace DAL.ModelsConfiguration
     {
         public void Configure(EntityTypeBuilder<OrdersProduct> builder)
         {
-            builder.HasKey(p => new { p.OrderId, p.ProductId });
+			builder.HasKey(p => new { p.OrderId, p.ProductId });
             builder.Property(p => p.OrderId).IsRequired();
             builder.Property(p => p.ProductId).IsRequired();
+            builder.Property(p => p.AmountOfItems).IsRequired().HasDefaultValue(1);
             builder.HasOne(p => p.Order)
                 .WithMany(o => o.Products)
                 .HasForeignKey(p => p.OrderId);

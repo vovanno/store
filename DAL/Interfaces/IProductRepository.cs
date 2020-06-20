@@ -1,14 +1,14 @@
-﻿using CrossCuttingFunctionality.FilterModels;
-using Domain.Entities;
+﻿using Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Domain.Entities.FilterModels;
 
 namespace DAL.Interfaces
 {
     public interface IProductRepository
     {
         Task LeaveComment(int productId, Comment comment);
-        Task<List<Product>> GetGamesWithFilters(FilterModel filter);
+        Task<List<Product>> GetProductsWithFilters(FilterModel filter);
         Task<List<Product>> ProductsWithCategoryId(int categoryId);
         Task<List<Product>> GetProductsByManufacturerId(int publisherId);
         Task<List<Product>> GetProductsByIds(int[] productsIds);
@@ -20,5 +20,6 @@ namespace DAL.Interfaces
         Task Delete(int productId);
         Task UploadImages(int productId, List<string> imagesNames);
         Task UploadImage(int productId, string imagesName, bool isMain);
+        Task<Product> CheckById(int productId);
     }
 }

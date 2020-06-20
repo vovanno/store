@@ -36,9 +36,11 @@ namespace DAL.Repositories
             return order ?? throw new EntryNotFoundException($"Order with OrderId={orderId} was not found");
         }
 
-        public async Task<IList<Order>> GetAll()
+        public async Task<IList<Order>> GetAll(string userId)
         {
-            return await _context.Orders.AsNoTracking().Where(p => (DateTime.Now - p.OrderDate).Days < 30).ToListAsync();
+            return await _context.Orders
+                .Include(p => p.Products)
+                .AsNoTracking().Where(p => p.UserId == userId && (DateTime.Now - p.OrderDate).Days < 30).ToListAsync();
         }
 
         public async Task<Order> Add(Order order)
@@ -63,9 +65,9 @@ namespace DAL.Repositories
                 new MySqlParameter("@orderId", orderId));
         }
 
-        public async Task<IList<Order>> GetOrdersHistory()
+        public async Task<IList<Order>> GetOrdersHistory(string userId)
         {
-            return await _context.Orders.Where(p => (DateTime.Now - p.OrderDate).Days > 30).ToListAsync();
+            return await _context.Orders.Include(p => p.Products).Where(p => p.UserId == userId).ToListAsync();
         }
     }
 }

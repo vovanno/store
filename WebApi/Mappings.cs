@@ -1,14 +1,13 @@
 ﻿using Domain;
 using Domain.Entities;
 using OnlineStoreApi.AuthApi;
-using OnlineStoreApi.CommentApi;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
 using OnlineStoreApi.CategoryApi;
+using OnlineStoreApi.CommentApi;
 using OnlineStoreApi.ManufactureApi;
 using OnlineStoreApi.OrdersApi;
 using OnlineStoreApi.ProductApi;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace WebApi
 {
@@ -26,6 +25,7 @@ namespace WebApi
                 DateOfAdding = comment.DateOfAdding,
                 AmountOfLikes = comment.AmountOfLikes,
                 Body = comment.Body,
+                UserName = comment.UserName,
                 Children = comment.Children.ToCommentResponse()
             };
         }
@@ -40,6 +40,7 @@ namespace WebApi
                 DateOfAdding = p.DateOfAdding,
                 CommentId = p.CommentId,
                 ProductId = p.ProductId,
+                UserName = p.UserName,
                 Children = p.Children.ToCommentResponse(),
             }).ToList();
         }
@@ -67,7 +68,11 @@ namespace WebApi
             return new UserProfile
             {
                 Email = request.Email,
-                UserName = request.UserName
+                UserName = request.UserName,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                City = request.City,
+                Phone = request.Phone
             };
         }
 
@@ -90,12 +95,30 @@ namespace WebApi
                 Description = product.Description,
                 Availability = product.Availability,
                 Rating = product.Rating,
-                Category = product.Category.ToCategoryResponse(),
+                Category = product.Category?.ToCategoryResponse(),
                 Manufacturer = product.Manufacturer.ToManufacturerResponse(),
-                Comments = product.Comments.ToCommentResponse(),
+                //Comments = product.Comments.ToCommentResponse(),
                 Images = product.Images.Select(x => new ImageResponse{ImageUrl = $"{DownloadUrl}{x.ImageKey}"}).ToList()
             };
         }
+
+        public static ProductResponse ToProductResponse(this Product product, IEnumerable<OrdersProduct> orders)
+        { 
+            return new ProductResponse
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Price = product.Price,
+                Description = product.Description,
+                Availability = product.Availability,
+                Rating = product.Rating,
+                Category = product.Category?.ToCategoryResponse(),
+                Manufacturer = product.Manufacturer.ToManufacturerResponse(),
+                Images = product.Images.Select(x => new ImageResponse { ImageUrl = $"{DownloadUrl}{x.ImageKey}" }).ToList(),
+                AmountOfItems = orders.Single(p => p.ProductId == product.ProductId).AmountOfItems
+            };
+        }
+
 
         public static ManufacturerResponse ToManufacturerResponse(this Manufacturer publisher)
         {

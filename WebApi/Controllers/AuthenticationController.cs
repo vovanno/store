@@ -13,6 +13,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Domain;
 
 namespace WebApi.Controllers
 {
@@ -53,7 +54,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login(LoginUserRequest request)
+        public async Task<ActionResult<string>> Login([FromBody]LoginUserRequest request)
         {
             var userProfile = request.ToUserProfile();
 
@@ -62,8 +63,21 @@ namespace WebApi.Controllers
             var token = GenerateJwt(userClaims);
             var response = new
             {
-                access_token = token,
-                userEmail = request.Email
+                access_token = token
+            };
+            var result = JsonConvert.SerializeObject(response);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<string>> UpdateUserProfile([FromBody] UpdateUserProfileRequest request)
+        {
+            var userId = Request.Headers.GetEmailFromDecodedToken();
+            var updatedClaims = await _authService.UpdateUserProfile(userId, request);
+            var token = GenerateJwt(updatedClaims);
+            var response = new
+            {
+                access_token = token
             };
             var result = JsonConvert.SerializeObject(response);
             return Ok(result);
@@ -79,7 +93,7 @@ namespace WebApi.Controllers
                 audience: _configuration["JWT:Audience"],
                 notBefore: DateTime.Now,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(20),
+                expires: DateTime.Now.AddMinutes(20).ToLocalTime(),
                 signingCredentials: credentials);
             var encodedToken = new JwtSecurityTokenHandler().WriteToken(token);
             return encodedToken;

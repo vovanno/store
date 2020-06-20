@@ -1,8 +1,8 @@
-﻿namespace CrossCuttingFunctionality.FilterModels
+﻿namespace Domain.Entities.FilterModels
 {
     public class PriceFilter
     {
-        public int From { get; set; } = 1;
-        public int To { get; set; } = 12;
+        public int From { get; set; }
+        public int To { get; set; }
     }
 }

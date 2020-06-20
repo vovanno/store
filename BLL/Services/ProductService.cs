@@ -1,7 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using BLL.Interfaces;
-using CrossCuttingFunctionality.FilterModels;
 using DAL.Interfaces;
 using Domain;
 using Domain.Entities;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Entities.FilterModels;
 using OnlineStoreApi.ProductApi;
 
 namespace BLL.Services
@@ -60,6 +60,14 @@ namespace BLL.Services
             return product;
         }
 
+        public async Task<List<Product>> GetProductsByIds(int[] ids)
+        {
+            var products = await _unit.ProductRepository.GetProductsByIds(ids);
+            products.CountRatingForProducts();
+
+            return products;
+        }
+
         public async Task<List<Product>> GetAll()
         {
             var products = await _unit.ProductRepository.GetAll();
@@ -68,9 +76,11 @@ namespace BLL.Services
             return products;
         }
 
-        public async Task<List<Product>> GetGamesWithFilters(FilterModel filter)
+        public async Task<List<Product>> GetProductsWithFilters(FilterModel filter)
         {
-            var products = await _unit.ProductRepository.GetGamesWithFilters(filter);
+            if (filter.PriceFilter.To == 0)
+                filter.PriceFilter.To = int.MaxValue;
+            var products = await _unit.ProductRepository.GetProductsWithFilters(filter);
             products.CountRatingForProducts();
 
             return products;

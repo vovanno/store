@@ -5,27 +5,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using OnlineStoreApi.OrdersApi;
+using OnlineStoreApi.ProductApi;
 
 namespace BLL.Services
 {
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unit;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public OrderService(IUnitOfWork unit)
+        public OrderService(IUnitOfWork unit, UserManager<IdentityUser> userManager)
         {
             _unit = unit;
+            _userManager = userManager;
         }
 
-        public async Task<int> AddOrder(int[] productIds)
+        public async Task<int> AddOrder(string userId, OrderedItem[] orderedItems)
         {
-            var foundProducts = await CheckProductsAvailability(productIds);
+            var foundProducts = await CheckProductsAvailability(orderedItems.Select(p => p.ProductId).ToArray());
             var utcNow = DateTime.UtcNow;
 
-            var orderRequest = new Order { OrderDate = utcNow };
+            var existedUser = await _userManager.FindByEmailAsync(userId);
+            if(existedUser == null)
+                throw new Exception($"User does not exist");
+
+            var orderRequest = new Order {UserId = userId, OrderDate = utcNow };
             var order = await _unit.OrderRepository.Add(orderRequest);
 
-            var products = foundProducts.Select(p => new OrdersProduct { OrderId = order.OrderId, ProductId = p.ProductId }).ToList();
+            var products = foundProducts.Select(p => new OrdersProduct
+            {
+                OrderId = order.OrderId,
+                ProductId = p.ProductId,
+                AmountOfItems = orderedItems.Single(x => x.ProductId == p.ProductId).AmountOfItems
+            }).ToList();
             order.Products = products;
 
             await _unit.Commit();
@@ -41,16 +55,21 @@ namespace BLL.Services
             await _unit.Commit();
         }
 
-        public async Task<IList<Order>> GetAll()
+        public async Task<(IList<Order>, IList<Product>)> GetAll(string userId)
         {
-            var result = await _unit.OrderRepository.GetAll();
-            return result.ToList();
+            var orders = await _unit.OrderRepository.GetAll(userId);
+            var products = await _unit.ProductRepository.GetProductsByIds(orders.SelectMany(p =>
+                p.Products.Select(x => x.ProductId)).ToArray());
+            return (orders, products);
         }
 
-        public async Task<IList<Order>> GetOrdersHistory()
+        public async Task<(IList<Order>, IList<Product>)> GetOrdersHistory(string userId)
         {
-            var result = await _unit.OrderRepository.GetOrdersHistory();
-            return result.ToList();
+            var orders = await _unit.OrderRepository.GetOrdersHistory(userId);
+            var products = await _unit.ProductRepository.GetProductsByIds(orders.SelectMany(p =>
+                p.Products.Select(x => x.ProductId)).ToArray());
+
+            return (orders, products);
         }
 
         public async Task<Order> GetOrderById(int orderId)

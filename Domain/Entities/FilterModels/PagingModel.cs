@@ -1,4 +1,4 @@
-﻿namespace CrossCuttingFunctionality.FilterModels
+﻿namespace Domain.Entities.FilterModels
 {
     public abstract class PagingModel
     {
@@ -11,7 +11,8 @@
             {
                 if (value != 0)
                     _page = value;
-                _page = 1;
+                else
+                    _page = 1;
             }
         }
 
@@ -22,7 +23,8 @@
             {
                 if (value != 0)
                     _size = value;
-                _size = 3;
+                else
+                    _size = 15;
             }
         }
     }

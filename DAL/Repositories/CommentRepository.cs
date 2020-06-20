@@ -3,10 +3,10 @@ using Domain.Entities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CrossCuttingFunctionality.FilterModels;
 using DAL.Context;
 using DAL.Exceptions;
 using Domain;
+using Domain.Entities.FilterModels;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 

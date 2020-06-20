@@ -1,14 +1,14 @@
-﻿using CrossCuttingFunctionality.FilterModels;
-using Domain.Entities;
+﻿using Domain.Entities;
 using OnlineStoreApi.ProductApi;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Domain.Entities.FilterModels;
 
 namespace BLL.Interfaces
 {
     public interface IProductService
     {
-        Task<List<Product>> GetGamesWithFilters(FilterModel filter);
+        Task<List<Product>> GetProductsWithFilters(FilterModel filter);
         Task<List<Product>> GetProductsByManufacturerId(int productId);
         Task<List<Product>> GetProductsByCategoryId(int categoryId);
         Task<int> Create(Product product);
@@ -17,5 +17,6 @@ namespace BLL.Interfaces
         Task<Product> GetById(int productId);
         Task<List<Product>> GetAll();
         Task UploadImages(int productId, CreateImageRequest[] createImagesRequest);
+        Task<List<Product>> GetProductsByIds(int[] productsIds);
     }
 }

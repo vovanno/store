@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace Domain
 {
@@ -54,6 +57,23 @@ namespace Domain
         public static void CountRatingForProducts(this List<Product> products)
         {
             products.ForEach(CountRatingForProduct);
+        }
+
+        public static string GetEmailFromDecodedToken(this IHeaderDictionary headers)
+        {
+            var stream = headers["Authorization"].ToString().Split(' ')[1];
+            var handler = new JwtSecurityTokenHandler();
+            JwtSecurityToken tokenS;
+            try
+            {
+                tokenS = handler.ReadToken(stream) as JwtSecurityToken;
+            }
+            catch (Exception JWT)
+            {
+                throw new UnauthorizedAccessException();
+            }
+            var email = tokenS.Claims.Single(p => p.Type == ClaimTypes.Email);
+            return email.Value;
         }
     }
 }

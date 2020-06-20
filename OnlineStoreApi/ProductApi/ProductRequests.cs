@@ -10,6 +10,11 @@
         public int CategoryId { get; set; }
     }
 
+    public class GetProductsByIds
+    {
+        public int[] ProductsIds { get; set; }
+    }
+
     public class EditProductRequest
     {
         public string Name { get; set; }

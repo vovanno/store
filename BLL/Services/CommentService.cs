@@ -1,10 +1,10 @@
 ﻿using BLL.Interfaces;
-using CrossCuttingFunctionality.FilterModels;
 using DAL.Interfaces;
 using Domain.Entities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Entities.FilterModels;
 
 namespace BLL.Services
 {
@@ -25,6 +25,8 @@ namespace BLL.Services
         public async Task<int> Create(Comment comment, int? parentId)
         {
             Comment createdComment = null;
+
+            await _unit.ProductRepository.CheckById(comment.ProductId);
 
             if (parentId == null || parentId == 0)
                 createdComment = await _unit.CommentRepository.Add(comment);

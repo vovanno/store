@@ -1,7 +1,7 @@
-﻿using CrossCuttingFunctionality.FilterModels;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Entities;
+using Domain.Entities.FilterModels;
 
 namespace BLL.Interfaces
 {

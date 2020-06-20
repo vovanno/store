@@ -15,8 +15,8 @@ namespace OnlineStoreApi.ProductApi
         public bool Availability { get; set; }
         public CategoryResponse Category { get; set; }
         public ManufacturerResponse Manufacturer { get; set; }
-        public IList<CommentResponse> Comments { get; set; }
         public IList<ImageResponse> Images { get; set; }
+        public int AmountOfItems { get; set; }
     }
 
     public class ImageResponse

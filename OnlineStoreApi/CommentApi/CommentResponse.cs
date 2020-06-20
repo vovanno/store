@@ -11,6 +11,7 @@ namespace OnlineStoreApi.CommentApi
         public int AmountOfLikes { get; set; }
         public DateTime DateOfAdding { get; set; }
         public int ProductId { get; set; }
+        public string UserName { get; set; }
         public List<CommentResponse> Children { get; set; }
     }
 }

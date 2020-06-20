@@ -1,5 +1,4 @@
 ﻿using BLL.Interfaces;
-using CrossCuttingFunctionality.FilterModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineStoreApi.CommentApi;
@@ -8,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Entities.FilterModels;
 
 namespace WebApi.Controllers
 {
@@ -39,6 +39,14 @@ namespace WebApi.Controllers
         {
             var game = await _productService.GetById(productId);
             return Ok(game.ToProductResponse());
+        }
+
+        [HttpPost("byIds")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<ProductResponse>>> GetByIds([FromBody] GetProductsByIds request)
+        {
+            var gamesList = await _productService.GetProductsByIds(request.ProductsIds);
+            return Ok(gamesList.Select(p => p.ToProductResponse()));
         }
 
         [HttpPost]
@@ -99,12 +107,12 @@ namespace WebApi.Controllers
             return Ok(comments.Select(p => p.ToCommentResponse()));
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("filters")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<ProductResponse>>> GetGamesWithFilters([FromQuery] FilterModel filter)
+        public async Task<ActionResult<List<ProductResponse>>> GetProductsWithFilters([FromBody] FilterModel filter)
         {
-            var games = await _productService.GetGamesWithFilters(filter);
+            var games = await _productService.GetProductsWithFilters(filter);
             return Ok(games.Select(p => p.ToProductResponse()));
         }
 
